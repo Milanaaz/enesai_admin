@@ -1,0 +1,273 @@
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  background: radial-gradient(circle at 10% -10%, #a044ff 0%, #8b2ee8 30%, #6d1fc8 68%, #651dbb 100%);
+}
+
+.login-card {
+  width: min(100%, 440px);
+  background: #efefef;
+  border-radius: 20px;
+  padding: 26px 24px 20px;
+  box-shadow: 0 10px 24px rgba(29, 11, 62, 0.12);
+  color: #0f2140;
+}
+
+.brand-icon {
+  width: 62px;
+  height: 62px;
+  margin: 0 auto 14px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, #8e2de2 0%, #6d1ec7 100%);
+}
+
+.brand-icon svg {
+  width: 28px;
+  height: 28px;
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 1.35;
+}
+
+.login-card h1 {
+  margin: 0;
+  text-align: center;
+  font-size: 28px;
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  margin: 8px 0 24px;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.24;
+  color: #4f5f78;
+}
+
+.login-form {
+  width: 100%;
+}
+
+.login-form label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  line-height: 1.25;
+  color: #2e3d56;
+  font-weight: 600;
+}
+
+.field-wrap {
+  height: 38px;
+  border-radius: 16px;
+  border: 1px solid #c4c8cf;
+  background: #e8e9eb;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  margin-bottom: 14px;
+}
+
+.field-wrap svg {
+  width: 22px;
+  height: 22px;
+  fill: #8e97a5;
+  flex: 0 0 auto;
+}
+
+.field-wrap input {
+  width: 100%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #66758c;
+  font-size: 12px;
+  line-height: 1;
+  outline: none;
+}
+
+.checkbox-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 500;
+  color: #4a5a73;
+  cursor: pointer;
+}
+
+.checkbox-row input {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  border-radius: 4px;
+  border: 1px solid #a9b1bc;
+  background: #f0f1f3;
+  position: relative;
+  flex: 0 0 auto;
+  transform: translateY(1px);
+}
+
+.checkbox-row input:checked::after {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 11px;
+  border: solid #7c30df;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  left: 6px;
+  top: 2px;
+}
+
+.form-error {
+  margin: 0 0 10px;
+  color: #b22a2a;
+  font-size: 12px;
+}
+
+.submit-btn {
+  width: 100%;
+  border: 0;
+  border-radius: 16px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(90deg, #8f2dea 0%, #8a28e5 45%, #7e24dc 100%);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+.submit-btn:disabled {
+  opacity: 0.8;
+  cursor: wait;
+}
+
+.submit-btn:hover:not(:disabled) {
+  filter: brightness(1.03);
+}
+
+.submit-btn:focus-visible {
+  outline: 3px solid #5320a7;
+  outline-offset: 2px;
+}
+
+.forgot-link {
+  display: block;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.2;
+  font-weight: 600;
+  color: #7e24dc;
+}
+
+.card-footer {
+  margin-top: 32px;
+  padding-top: 14px;
+  text-align: center;
+  border-top: 1px solid #d3d5d9;
+  font-size: 12px;
+  color: #5f6f85;
+}
+
+@media (max-width: 900px) {
+  .login-card {
+    width: min(100%, 360px);
+    border-radius: 16px;
+    padding: 18px 14px 14px;
+  }
+
+  .brand-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    margin-bottom: 10px;
+  }
+
+  .brand-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .login-card h1 {
+    font-size: 24px;
+  }
+
+  .subtitle {
+    margin: 6px 0 18px;
+    font-size: 12px;
+  }
+
+  .login-form label {
+    margin-bottom: 5px;
+    font-size: 12px;
+  }
+
+  .field-wrap {
+    height: 34px;
+    border-radius: 14px;
+    gap: 6px;
+    padding: 0 10px;
+    margin-bottom: 12px;
+  }
+
+  .field-wrap svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .field-wrap input {
+    font-size: 12px;
+  }
+
+  .checkbox-row {
+    gap: 7px;
+    font-size: 12px;
+    margin: 0 0 12px;
+  }
+
+  .checkbox-row input {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+  }
+
+  .checkbox-row input:checked::after {
+    width: 5px;
+    height: 9px;
+    left: 5px;
+    top: 2px;
+  }
+
+  .submit-btn {
+    height: 34px;
+    border-radius: 14px;
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+
+  .forgot-link {
+    font-size: 12px;
+  }
+
+  .card-footer {
+    margin-top: 20px;
+    padding-top: 12px;
+    font-size: 11px;
+  }
+}
