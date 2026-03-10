@@ -1,5 +1,5 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import { loginRequest } from '../api/authApi.js'
+﻿import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { loginRequest, requestPasswordReset } from '../api/authApi.js'
 import { clearSession, readSession, writeSession } from '../model/sessionStorage.js'
 
 const AuthContext = createContext(null)
@@ -8,7 +8,9 @@ export function AuthProvider({ children }) {
   const [session, setSession] = useState(null)
   const [isHydrating, setIsHydrating] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isResetSubmitting, setIsResetSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [resetMessage, setResetMessage] = useState('')
 
   useEffect(() => {
     const storedSession = readSession()
@@ -36,10 +38,34 @@ export function AuthProvider({ children }) {
     }
   }
 
+  const forgotPassword = async ({ email }) => {
+    setIsResetSubmitting(true)
+    setError('')
+    setResetMessage('')
+
+    try {
+      const result = await requestPasswordReset({ email })
+      setResetMessage(result.message)
+      return true
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Не удалось отправить письмо для восстановления'
+      setError(message)
+      return false
+    } finally {
+      setIsResetSubmitting(false)
+    }
+  }
+
   const logout = () => {
     clearSession()
     setSession(null)
     setError('')
+    setResetMessage('')
+  }
+
+  const clearStatus = () => {
+    setError('')
+    setResetMessage('')
   }
 
   const value = useMemo(
@@ -48,12 +74,15 @@ export function AuthProvider({ children }) {
       isAuthenticated: Boolean(session?.token),
       isHydrating,
       isSubmitting,
+      isResetSubmitting,
       error,
+      resetMessage,
       login,
+      forgotPassword,
       logout,
-      clearError: () => setError(''),
+      clearError: clearStatus,
     }),
-    [session, isHydrating, isSubmitting, error],
+    [session, isHydrating, isSubmitting, isResetSubmitting, error, resetMessage],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
