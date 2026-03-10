@@ -1,0 +1,196 @@
+.lessons-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.lessons-page-header h1 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: #0c1f44;
+}
+
+.lessons-page-header p {
+  margin: 8px 0 0;
+  color: #4c5f7d;
+  font-size: 12px;
+}
+
+.lessons-create-btn {
+  margin-top: 4px;
+  height: 38px;
+  border: 0;
+  border-radius: 14px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(90deg, #8d32f0 0%, #762ade 100%);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.lessons-create-btn .admin-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.lessons-filters {
+  margin-top: 14px;
+  border: 1px solid #dde3eb;
+  border-radius: 16px;
+  background: #fbfcfe;
+  padding: 14px;
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 280px;
+  gap: 12px;
+}
+
+.lessons-search {
+  height: 42px;
+  border: 1px solid #cfd6e2;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  color: #8b98ad;
+}
+
+.lessons-search input {
+  width: 100%;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: #1b2f53;
+  font-size: 13px;
+}
+
+.lessons-filters select {
+  height: 42px;
+  border: 1px solid #cfd6e2;
+  border-radius: 14px;
+  padding: 0 14px;
+  font-size: 13px;
+  color: #263b61;
+  background: #fbfcfe;
+}
+
+.lessons-table-card {
+  margin-top: 14px;
+  border: 1px solid #dde3eb;
+  border-radius: 16px;
+  background: #fbfcfe;
+  overflow: hidden;
+}
+
+.lessons-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.lessons-table th,
+.lessons-table td {
+  padding: 12px 10px;
+  text-align: left;
+  border-bottom: 1px solid #e3e8f0;
+  color: #213456;
+  font-size: 12px;
+}
+
+.lessons-table th {
+  font-size: 13px;
+  font-weight: 700;
+  color: #102445;
+}
+
+.lessons-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.lesson-name-cell {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0d2146;
+}
+
+.lesson-module-badge,
+.lesson-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.lesson-module-badge {
+  color: #6d2edd;
+  background: #eee6fb;
+}
+
+.lesson-status-badge.is-published {
+  color: #1f8558;
+  background: #cfeeda;
+}
+
+.lesson-status-badge.is-draft {
+  color: #4e5a70;
+  background: #eaedf3;
+}
+
+.lesson-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lesson-actions button {
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #5f6f87;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.lesson-actions button:hover {
+  background: #eef2f8;
+}
+
+.lesson-actions .is-danger {
+  color: #e13a33;
+}
+
+@media (max-width: 1200px) {
+  .lessons-page-header {
+    flex-wrap: wrap;
+  }
+
+  .lessons-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .lessons-table-card {
+    overflow-x: auto;
+  }
+
+  .lessons-table {
+    min-width: 900px;
+  }
+}
+
+@media (max-width: 760px) {
+  .lessons-page-header h1 {
+    font-size: 22px;
+  }
+}

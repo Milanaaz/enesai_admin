@@ -1,0 +1,137 @@
+.tests-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tests-page-header h1 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: #0c1f44;
+}
+
+.tests-page-header p {
+  margin: 8px 0 0;
+  color: #4c5f7d;
+  font-size: 12px;
+}
+
+.tests-create-btn {
+  margin-top: 4px;
+  height: 38px;
+  border: 0;
+  border-radius: 14px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(90deg, #8d32f0 0%, #762ade 100%);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tests-create-btn .admin-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.tests-table-card {
+  margin-top: 14px;
+  border: 1px solid #dde3eb;
+  border-radius: 16px;
+  background: #fbfcfe;
+  overflow: hidden;
+}
+
+.tests-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tests-table th,
+.tests-table td {
+  padding: 12px 10px;
+  text-align: left;
+  border-bottom: 1px solid #e3e8f0;
+  color: #213456;
+  font-size: 12px;
+}
+
+.tests-table th {
+  font-size: 13px;
+  font-weight: 700;
+  color: #102445;
+}
+
+.tests-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.test-name-cell {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0d2146;
+}
+
+.test-score-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1f8558;
+  background: #cfeeda;
+}
+
+.test-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.test-actions button {
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #5f6f87;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.test-actions button:hover {
+  background: #eef2f8;
+}
+
+.test-actions .is-danger {
+  color: #e13a33;
+}
+
+@media (max-width: 1200px) {
+  .tests-page-header {
+    flex-wrap: wrap;
+  }
+
+  .tests-table-card {
+    overflow-x: auto;
+  }
+
+  .tests-table {
+    min-width: 880px;
+  }
+}
+
+@media (max-width: 760px) {
+  .tests-page-header h1 {
+    font-size: 22px;
+  }
+}

@@ -1,0 +1,145 @@
+.articles-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.articles-page-header h1 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: #0c1f44;
+}
+
+.articles-page-header p {
+  margin: 8px 0 0;
+  color: #4c5f7d;
+  font-size: 12px;
+}
+
+.articles-create-btn {
+  margin-top: 4px;
+  height: 38px;
+  border: 0;
+  border-radius: 14px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(90deg, #8d32f0 0%, #762ade 100%);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.articles-create-btn .admin-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.articles-table-card {
+  margin-top: 14px;
+  border: 1px solid #dde3eb;
+  border-radius: 16px;
+  background: #fbfcfe;
+  overflow: hidden;
+}
+
+.articles-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.articles-table th,
+.articles-table td {
+  padding: 12px 10px;
+  text-align: left;
+  border-bottom: 1px solid #e3e8f0;
+  color: #213456;
+  font-size: 12px;
+}
+
+.articles-table th {
+  font-size: 13px;
+  font-weight: 700;
+  color: #102445;
+}
+
+.articles-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.article-name-cell {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0d2146;
+}
+
+.article-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.article-status-badge.is-published {
+  color: #1f8558;
+  background: #cfeeda;
+}
+
+.article-status-badge.is-draft {
+  color: #4e5a70;
+  background: #eaedf3;
+}
+
+.article-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.article-actions button {
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #5f6f87;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.article-actions button:hover {
+  background: #eef2f8;
+}
+
+.article-actions .is-danger {
+  color: #e13a33;
+}
+
+@media (max-width: 1200px) {
+  .articles-page-header {
+    flex-wrap: wrap;
+  }
+
+  .articles-table-card {
+    overflow-x: auto;
+  }
+
+  .articles-table {
+    min-width: 860px;
+  }
+}
+
+@media (max-width: 760px) {
+  .articles-page-header h1 {
+    font-size: 22px;
+  }
+}

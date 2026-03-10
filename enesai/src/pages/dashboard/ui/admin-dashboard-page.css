@@ -1,13 +1,14 @@
 .dashboard-layout {
   min-height: 100vh;
   display: grid;
-  grid-template-columns: 272px minmax(0, 1fr);
+  grid-template-columns: 248px minmax(0, 1fr);
   background: #f5f6f8;
   color: #10203f;
+  transition: grid-template-columns 240ms ease;
 }
 
 .dashboard-layout.collapsed {
-  grid-template-columns: 88px minmax(0, 1fr);
+  grid-template-columns: 78px minmax(0, 1fr);
 }
 
 .dashboard-sidebar {
@@ -16,48 +17,52 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  transition: width 240ms ease, box-shadow 240ms ease;
 }
 
 .sidebar-top {
-  height: 72px;
+  height: 66px;
   border-bottom: 1px solid #e3e7ef;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 18px;
+  padding: 0 14px;
 }
 
 .brand {
   display: flex;
   align-items: center;
   gap: 10px;
+  height: 32px;
 }
 
 .brand strong {
-  font-size: 22px;
+  display: block;
+  font-size: 18px;
   font-weight: 800;
+  line-height: 32px;
   letter-spacing: -0.03em;
   color: #0c1f44;
 }
 
 .brand-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
   display: grid;
   place-items: center;
   background: linear-gradient(160deg, #8d32f0 0%, #7528de 100%);
 }
 
 .brand-icon .icon {
-  width: 20px;
-  height: 20px;
+  width: 17px;
+  height: 17px;
   color: #fff;
 }
 
 .icon {
-  width: 21px;
-  height: 21px;
+  width: 18px;
+  height: 18px;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.8;
@@ -67,21 +72,30 @@
 }
 
 .sidebar-menu-btn {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border: 0;
   border-radius: 10px;
   background: transparent;
   color: #4a5670;
   cursor: pointer;
+  transition: background-color 180ms ease;
+}
+
+.sidebar-menu-btn .icon {
+  transition: transform 220ms ease;
 }
 
 .sidebar-menu-btn:hover {
   background: #f0f2f7;
 }
 
+.dashboard-layout.collapsed .sidebar-menu-btn .icon {
+  transform: rotate(-180deg);
+}
+
 .sidebar-nav {
-  padding: 14px 12px;
+  padding: 12px 10px;
   display: grid;
   gap: 6px;
   align-content: start;
@@ -90,18 +104,27 @@
 
 .nav-item {
   border: 0;
-  height: 50px;
-  border-radius: 14px;
+  height: 44px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 0 14px;
+  gap: 10px;
+  padding: 0 12px;
   background: transparent;
   color: #303e58;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 600;
   text-align: left;
   cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.nav-item .icon {
+  transition: transform 180ms ease;
 }
 
 .nav-item.active {
@@ -111,11 +134,16 @@
 
 .nav-item:not(.active):hover {
   background: #f1f4f9;
+  transform: translateX(2px);
+}
+
+.nav-item:hover .icon {
+  transform: scale(1.06);
 }
 
 .sidebar-user {
   border-top: 1px solid #e3e7ef;
-  padding: 16px;
+  padding: 12px;
 }
 
 .user-block {
@@ -125,12 +153,12 @@
 }
 
 .user-avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
   background: linear-gradient(145deg, #be73f4 8%, #842ff0 92%);
   color: #fff;
-  font-size: 31px;
+  font-size: 24px;
   font-weight: 700;
   display: grid;
   place-items: center;
@@ -142,37 +170,38 @@
 }
 
 .user-meta strong {
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.2;
   color: #15274a;
 }
 
 .user-meta span {
   color: #6c7890;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .logout-link {
   margin-top: 12px;
-  margin-left: 56px;
+  margin-left: 0;
   border: 0;
   background: transparent;
   color: #e13a33;
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 700;
   display: inline-flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 8px;
   cursor: pointer;
 }
 
 .logout-link .icon {
-  width: 17px;
-  height: 17px;
+  width: 15px;
+  height: 15px;
 }
 
 .dashboard-sidebar.collapsed {
-  width: 88px;
+  width: 78px;
 }
 
 .dashboard-sidebar.collapsed .sidebar-top {
@@ -193,7 +222,7 @@
 }
 
 .dashboard-sidebar.collapsed .nav-item {
-  width: 52px;
+  width: 46px;
   justify-content: center;
   padding: 0;
 }
@@ -205,35 +234,36 @@
 }
 
 .dashboard-content {
-  padding: 38px 34px 26px;
+  padding: 26px 24px 20px;
   overflow-x: auto;
+  transition: padding 240ms ease;
 }
 
 .content-header h1 {
   margin: 0;
-  font-size: 48px;
-  line-height: 1.05;
+  font-size: 22px;
+  line-height: 1.2;
   letter-spacing: -0.02em;
   color: #0b1f44;
 }
 
 .content-header p {
-  margin: 10px 0 0;
-  font-size: 16px;
+  margin: 6px 0 0;
+  font-size: 13px;
   color: #465877;
 }
 
 .stats-grid {
-  margin-top: 30px;
+  margin-top: 20px;
   display: grid;
-  grid-template-columns: repeat(4, minmax(230px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(4, minmax(210px, 1fr));
+  gap: 14px;
 }
 
 .stats-card {
-  min-height: 232px;
-  padding: 24px;
-  border-radius: 18px;
+  min-height: 182px;
+  padding: 16px;
+  border-radius: 14px;
   border: 1px solid #dde3eb;
   background: #fbfcfe;
   display: flex;
@@ -247,9 +277,9 @@
 }
 
 .stats-icon {
-  width: 54px;
-  height: 54px;
-  border-radius: 16px;
+  width: 46px;
+  height: 46px;
+  border-radius: 13px;
   display: grid;
   place-items: center;
 }
@@ -280,42 +310,42 @@
   align-items: center;
   gap: 4px;
   color: #2f9a68;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
 }
 
 .stats-growth .icon {
-  width: 16px;
-  height: 16px;
+  width: 13px;
+  height: 13px;
 }
 
 .stats-title {
-  margin: 48px 0 0;
+  margin: 34px 0 0;
   color: #3e5271;
-  font-size: 16px;
+  font-size: 13px;
 }
 
 .stats-value {
-  margin-top: 14px;
+  margin-top: 10px;
   color: #0b1f44;
-  font-size: 46px;
+  font-size: 24px;
   line-height: 1;
   letter-spacing: -0.02em;
 }
 
 .info-grid {
-  margin-top: 22px;
+  margin-top: 16px;
   display: grid;
-  grid-template-columns: repeat(2, minmax(340px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(2, minmax(320px, 1fr));
+  gap: 14px;
 }
 
 .panel-card {
-  border-radius: 18px;
+  border-radius: 14px;
   border: 1px solid #dde3eb;
   background: #fbfcfe;
-  min-height: 455px;
-  padding: 24px;
+  min-height: 382px;
+  padding: 16px;
 }
 
 .panel-header {
@@ -327,8 +357,8 @@
 
 .panel-header h2 {
   margin: 0;
-  font-size: 40px;
-  line-height: 1.1;
+  font-size: 18px;
+  line-height: 1.2;
   letter-spacing: -0.02em;
   color: #0b1f44;
 }
@@ -337,7 +367,7 @@
   border: 0;
   background: transparent;
   color: #7a2eeb;
-  font-size: 14px;
+  font-size: 12px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -345,18 +375,18 @@
 }
 
 .panel-list {
-  margin-top: 18px;
+  margin-top: 12px;
   display: grid;
-  gap: 14px;
+  gap: 10px;
 }
 
 .user-row {
-  min-height: 98px;
+  min-height: 80px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 10px 8px;
+  padding: 8px 6px;
 }
 
 .user-main {
@@ -366,12 +396,12 @@
 }
 
 .list-avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
   background: linear-gradient(145deg, #be73f4 8%, #842ff0 92%);
   color: #fff;
-  font-size: 29px;
+  font-size: 22px;
   font-weight: 700;
   display: grid;
   place-items: center;
@@ -380,14 +410,14 @@
 .user-main h3 {
   margin: 0;
   color: #12264b;
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.2;
 }
 
 .user-main p {
   margin: 2px 0 0;
   color: #61718c;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .user-side {
@@ -397,10 +427,10 @@
 }
 
 .status-pill {
-  min-width: 90px;
+  min-width: 78px;
   border-radius: 999px;
   padding: 4px 12px;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   text-align: center;
 }
@@ -417,14 +447,14 @@
 
 .user-side small {
   color: #61718c;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .course-row {
-  min-height: 102px;
-  border-radius: 16px;
+  min-height: 84px;
+  border-radius: 12px;
   background: #f3f5f9;
-  padding: 20px;
+  padding: 14px;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -434,18 +464,18 @@
 .course-main h3 {
   margin: 0;
   color: #0f2247;
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.14;
   letter-spacing: -0.01em;
 }
 
 .course-main p {
-  margin: 12px 0 0;
+  margin: 8px 0 0;
   display: flex;
   align-items: center;
   gap: 10px;
   color: #4e607d;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .course-main p span {
@@ -453,8 +483,8 @@
 }
 
 .users-mini-icon {
-  width: 18px;
-  height: 18px;
+  width: 15px;
+  height: 15px;
 }
 
 .course-rating {
@@ -462,15 +492,27 @@
   align-items: center;
   gap: 6px;
   color: #d08a10;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
 }
 
 .course-rating .icon {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   fill: currentColor;
   stroke-width: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-layout,
+  .dashboard-sidebar,
+  .sidebar-menu-btn,
+  .sidebar-menu-btn .icon,
+  .nav-item,
+  .nav-item .icon,
+  .dashboard-content {
+    transition: none !important;
+  }
 }
 
 @media (max-width: 1300px) {
@@ -520,17 +562,17 @@
   }
 
   .logout-link {
-    margin-left: 56px;
+    margin-left: 0;
     display: inline-flex;
   }
 
   .dashboard-content {
-    padding: 28px 16px 20px;
+    padding: 22px 14px 16px;
   }
 
   .stats-grid {
-    grid-template-columns: repeat(2, minmax(220px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(2, minmax(190px, 1fr));
+    gap: 12px;
   }
 
   .info-grid {
@@ -541,11 +583,11 @@
 
 @media (max-width: 760px) {
   .content-header h1 {
-    font-size: 34px;
+    font-size: 20px;
   }
 
   .content-header p {
-    font-size: 15px;
+    font-size: 12px;
   }
 
   .stats-grid {
@@ -553,16 +595,16 @@
   }
 
   .stats-title {
-    margin-top: 28px;
-    font-size: 15px;
+    margin-top: 22px;
+    font-size: 12px;
   }
 
   .stats-value {
-    font-size: 36px;
+    font-size: 22px;
   }
 
   .stats-growth {
-    font-size: 13px;
+    font-size: 11px;
   }
 
   .panel-card {
@@ -570,29 +612,29 @@
   }
 
   .panel-header h2 {
-    font-size: 28px;
+    font-size: 16px;
   }
 
   .panel-link {
-    font-size: 14px;
+    font-size: 11px;
   }
 
   .user-main h3,
   .course-main h3 {
-    font-size: 16px;
+    font-size: 13px;
   }
 
   .user-main p,
   .user-side small,
   .course-main p {
-    font-size: 13px;
+    font-size: 11px;
   }
 
   .status-pill {
-    font-size: 13px;
+    font-size: 11px;
   }
 
   .course-rating {
-    font-size: 14px;
+    font-size: 11px;
   }
 }

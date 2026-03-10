@@ -1,7 +1,7 @@
 ﻿import './styles.css'
 import { AuthProvider, useAuth } from '../features/auth/context/AuthProvider.jsx'
 import LoginPage from '../pages/login/ui/LoginPage.jsx'
-import AdminDashboardPage from '../pages/dashboard/ui/AdminDashboardPage.jsx'
+import AdminPanelPage from '../pages/admin/ui/AdminPanelPage.jsx'
 
 function AppContent() {
   const { isAuthenticated, isHydrating } = useAuth()
@@ -10,7 +10,7 @@ function AppContent() {
     return <div className="app-loading">Загрузка...</div>
   }
 
-  return isAuthenticated ? <AdminDashboardPage /> : <LoginPage />
+  return isAuthenticated ? <AdminPanelPage /> : <LoginPage />
 }
 
 function App() {
@@ -22,3 +22,4 @@ function App() {
 }
 
 export default App
+

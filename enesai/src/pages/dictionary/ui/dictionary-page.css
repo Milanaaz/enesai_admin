@@ -1,0 +1,258 @@
+.dictionary-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dictionary-page-header h1 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: #0c1f44;
+}
+
+.dictionary-page-header p {
+  margin: 8px 0 0;
+  color: #4c5f7d;
+  font-size: 12px;
+}
+
+.dictionary-create-btn {
+  margin-top: 4px;
+  height: 38px;
+  border: 0;
+  border-radius: 14px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(90deg, #8d32f0 0%, #762ade 100%);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.dictionary-summary-grid {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(170px, 1fr));
+  gap: 12px;
+}
+
+.dictionary-summary-card {
+  min-height: 118px;
+  padding: 16px 14px;
+  border-radius: 16px;
+  border: 1px solid #dde3eb;
+  background: #fbfcfe;
+}
+
+.dictionary-summary-card p {
+  margin: 0;
+  font-size: 13px;
+  color: #334968;
+}
+
+.dictionary-summary-card strong {
+  display: block;
+  margin-top: 26px;
+  font-size: 18px;
+  line-height: 1;
+  color: #0e2448;
+}
+
+.dictionary-summary-card .is-violet {
+  color: #7b31ec;
+}
+
+.dictionary-summary-card .is-green {
+  color: #2b9768;
+}
+
+.dictionary-summary-card .is-muted {
+  color: #607089;
+}
+
+.dictionary-filters {
+  margin-top: 14px;
+  border: 1px solid #dde3eb;
+  border-radius: 16px;
+  background: #fbfcfe;
+  padding: 14px;
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 180px;
+  gap: 12px;
+}
+
+.dictionary-search {
+  height: 42px;
+  border: 1px solid #cfd6e2;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  color: #8b98ad;
+}
+
+.dictionary-search input {
+  width: 100%;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: #1b2f53;
+  font-size: 13px;
+}
+
+.dictionary-filters select {
+  height: 42px;
+  border: 1px solid #cfd6e2;
+  border-radius: 14px;
+  padding: 0 14px;
+  font-size: 13px;
+  color: #263b61;
+  background: #fbfcfe;
+}
+
+.dictionary-table-card {
+  margin-top: 14px;
+  border: 1px solid #dde3eb;
+  border-radius: 16px;
+  background: #fbfcfe;
+  overflow: hidden;
+}
+
+.dictionary-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dictionary-table th,
+.dictionary-table td {
+  padding: 11px 10px;
+  text-align: left;
+  border-bottom: 1px solid #e3e8f0;
+  color: #213456;
+  font-size: 12px;
+}
+
+.dictionary-table th {
+  font-size: 13px;
+  font-weight: 700;
+  color: #102445;
+}
+
+.dictionary-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.dictionary-kyrgyz-cell {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0d2146;
+}
+
+.dictionary-russian-cell {
+  color: #7b31ec;
+  font-weight: 700;
+}
+
+.dictionary-category-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #6d2edd;
+  background: #eee6fb;
+}
+
+.dictionary-example-cell {
+  color: #54647d;
+  font-style: italic;
+}
+
+.dictionary-audio-btn {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 12px;
+  background: #efe8fb;
+  color: #7a2feb;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.dictionary-audio-btn .admin-icon {
+  width: 17px;
+  height: 17px;
+}
+
+.dictionary-no-audio {
+  color: #8a98ad;
+  font-size: 12px;
+}
+
+.dictionary-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dictionary-actions button {
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #5f6f87;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.dictionary-actions button:hover {
+  background: #eef2f8;
+}
+
+.dictionary-actions .is-danger {
+  color: #e13a33;
+}
+
+@media (max-width: 1200px) {
+  .dictionary-page-header {
+    flex-wrap: wrap;
+  }
+
+  .dictionary-summary-grid {
+    grid-template-columns: repeat(2, minmax(170px, 1fr));
+  }
+
+  .dictionary-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .dictionary-table-card {
+    overflow-x: auto;
+  }
+
+  .dictionary-table {
+    min-width: 980px;
+  }
+}
+
+@media (max-width: 760px) {
+  .dictionary-page-header h1 {
+    font-size: 22px;
+  }
+
+  .dictionary-summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
