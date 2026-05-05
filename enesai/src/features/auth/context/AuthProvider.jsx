@@ -1,6 +1,7 @@
 ﻿import { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import { loginRequest, requestPasswordReset } from '../api/authApi.js'
-import { clearSession, readSession, writeSession } from '../model/sessionStorage.js'
+import { fetchMyProfile, updateMyProfile } from '../../../pages/users/api/usersApi.js'
+import { loginRequest } from '../api/authApi.js'
+import { clearSession, readSession, updateStoredSession, writeSession } from '../model/sessionStorage.js'
 
 const AuthContext = createContext(null)
 
@@ -8,9 +9,7 @@ export function AuthProvider({ children }) {
   const [session, setSession] = useState(null)
   const [isHydrating, setIsHydrating] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isResetSubmitting, setIsResetSubmitting] = useState(false)
   const [error, setError] = useState('')
-  const [resetMessage, setResetMessage] = useState('')
 
   useEffect(() => {
     const storedSession = readSession()
@@ -38,51 +37,85 @@ export function AuthProvider({ children }) {
     }
   }
 
-  const forgotPassword = async ({ email }) => {
-    setIsResetSubmitting(true)
-    setError('')
-    setResetMessage('')
-
-    try {
-      const result = await requestPasswordReset({ email })
-      setResetMessage(result.message)
-      return true
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Не удалось отправить письмо для восстановления'
-      setError(message)
-      return false
-    } finally {
-      setIsResetSubmitting(false)
+  const refreshProfile = async () => {
+    const token = session?.token
+    if (!token) {
+      throw new Error('Токен авторизации отсутствует')
     }
+
+    const profile = await fetchMyProfile({ token })
+    const nextSession = {
+      ...session,
+      user: {
+        ...(session?.user ?? {}),
+        ...profile,
+      },
+    }
+
+    setSession(nextSession)
+    updateStoredSession((current) => ({
+      ...current,
+      user: {
+        ...(current?.user ?? {}),
+        ...profile,
+      },
+    }))
+
+    return nextSession.user
+  }
+
+  const saveMyProfile = async (profilePayload) => {
+    const token = session?.token
+    if (!token) {
+      throw new Error('Токен авторизации отсутствует')
+    }
+
+    const profile = await updateMyProfile({ token, profile: profilePayload })
+    const nextSession = {
+      ...session,
+      user: {
+        ...(session?.user ?? {}),
+        ...profile,
+      },
+    }
+
+    setSession(nextSession)
+    updateStoredSession((current) => ({
+      ...current,
+      user: {
+        ...(current?.user ?? {}),
+        ...profile,
+      },
+    }))
+
+    return nextSession.user
   }
 
   const logout = () => {
     clearSession()
     setSession(null)
     setError('')
-    setResetMessage('')
   }
 
-  const clearStatus = () => {
+  const clearError = () => {
     setError('')
-    setResetMessage('')
   }
 
   const value = useMemo(
     () => ({
       user: session?.user ?? null,
+      token: session?.token ?? '',
       isAuthenticated: Boolean(session?.token),
       isHydrating,
       isSubmitting,
-      isResetSubmitting,
       error,
-      resetMessage,
       login,
-      forgotPassword,
+      refreshProfile,
+      saveMyProfile,
       logout,
-      clearError: clearStatus,
+      clearError,
     }),
-    [session, isHydrating, isSubmitting, isResetSubmitting, error, resetMessage],
+    [session, isHydrating, isSubmitting, error],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

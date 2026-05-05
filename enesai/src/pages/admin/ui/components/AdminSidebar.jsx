@@ -1,4 +1,4 @@
-import AdminIcon from './AdminIcon.jsx'
+﻿import AdminIcon from './AdminIcon.jsx'
 
 const menuItems = [
   { key: 'dashboard', label: 'Дашборд', icon: 'dashboard' },
@@ -22,7 +22,7 @@ function getInitials(name) {
     .toUpperCase()
 }
 
-function AdminSidebar({ collapsed, activePage, onToggle, onSelectPage, adminName, onLogout }) {
+function AdminSidebar({ collapsed, activePage, onToggle, onSelectPage, adminName, adminRoleLabel, onLogout }) {
   return (
     <aside className={`admin-sidebar ${collapsed ? 'collapsed' : ''}`}>
       <div className="admin-sidebar-top">
@@ -57,7 +57,7 @@ function AdminSidebar({ collapsed, activePage, onToggle, onSelectPage, adminName
           <div className="admin-user-avatar">{getInitials(adminName)}</div>
           <div className="admin-user-meta">
             <strong>{adminName}</strong>
-            <span>Супер админ</span>
+            <span>{adminRoleLabel}</span>
           </div>
         </div>
 

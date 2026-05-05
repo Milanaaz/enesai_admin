@@ -1,48 +1,162 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useAuth } from '../../../features/auth/context/AuthProvider.jsx'
+import { fetchAllUsers } from '../../users/api/usersApi.js'
 import AdminIcon from '../../admin/ui/components/AdminIcon.jsx'
 import './admins-page.css'
 
-const adminRows = [
-  {
-    name: 'Супер Админ',
-    email: 'superadmin@enesai.kg',
-    role: 'Супер админ',
-    status: 'Активен',
-    lastLogin: 'Сегодня',
-  },
-  {
-    name: 'Айгерим Нурланова',
-    email: 'aigerim@enesai.kg',
-    role: 'Админ',
-    status: 'Активен',
-    lastLogin: 'Вчера',
-  },
-  {
-    name: 'Канат Усенов',
-    email: 'kanat@enesai.kg',
-    role: 'Админ',
-    status: 'Активен',
-    lastLogin: '3 марта',
-  },
-]
+const ADMIN_ROLE_LABELS = {
+  SUPER_ADMIN: 'Супер админ',
+  ADMIN: 'Админ',
+  CONTENT_ADMIN: 'Контент-админ',
+}
 
 function getInitial(name) {
-  return name.trim().charAt(0).toUpperCase()
+  const safeName = String(name || '').trim()
+  return safeName ? safeName.charAt(0).toUpperCase() : '?'
+}
+
+function getDisplayName(user) {
+  const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim()
+  if (fullName) return fullName
+  if (typeof user?.name === 'string' && user.name.trim()) return user.name.trim()
+  if (typeof user?.email === 'string' && user.email.trim()) return user.email.trim()
+  return 'Без имени'
+}
+
+function normalizeRole(rawRole) {
+  const normalized = String(rawRole || '')
+    .trim()
+    .toUpperCase()
+    .replace(/[\s-]+/g, '_')
+
+  const withoutPrefix = normalized.startsWith('ROLE_') ? normalized.slice(5) : normalized
+
+  if (withoutPrefix === 'SUPER_ADMIN' || withoutPrefix === 'SUPERADMIN') return 'SUPER_ADMIN'
+  if (withoutPrefix === 'ADMIN' || withoutPrefix === 'ADMINISTRATOR') return 'ADMIN'
+  if (withoutPrefix === 'CONTENT_ADMIN' || withoutPrefix === 'CONTENTADMIN') return 'CONTENT_ADMIN'
+  return null
+}
+
+function getStatusLabel(user) {
+  const rawStatus =
+    typeof user?.status === 'string'
+      ? user.status.trim().toUpperCase()
+      : typeof user?.accountStatus === 'string'
+        ? user.accountStatus.trim().toUpperCase()
+        : ''
+
+  const blocked =
+    user?.blocked === true ||
+    user?.isBlocked === true ||
+    rawStatus === 'BLOCKED' ||
+    rawStatus === 'BANNED'
+
+  if (blocked) return 'Заблокирован'
+
+  if (
+    rawStatus === 'INACTIVE' ||
+    rawStatus === 'DISABLED' ||
+    rawStatus === 'DEACTIVATED' ||
+    user?.active === false ||
+    user?.enabled === false
+  ) {
+    return 'Неактивен'
+  }
+
+  return 'Активен'
+}
+
+function formatLastLogin(dateValue) {
+  if (!dateValue) return '-'
+  const date = new Date(dateValue)
+  if (Number.isNaN(date.getTime())) return '-'
+  return new Intl.DateTimeFormat('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(date)
 }
 
 function AdminsPage() {
+  const { token } = useAuth()
+  const [admins, setAdmins] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState('Все роли')
 
+  useEffect(() => {
+    let isAlive = true
+
+    const loadAdmins = async () => {
+      setIsLoading(true)
+      setError('')
+
+      try {
+        const allUsers = await fetchAllUsers({ token })
+        if (!isAlive) return
+
+        const normalizedAdmins = allUsers
+          .map((user) => {
+            const roleCode = normalizeRole(user?.role)
+            if (!roleCode) return null
+            return {
+              id: user?.id || user?.email,
+              name: getDisplayName(user),
+              email: user?.email || '-',
+              roleCode,
+              role: ADMIN_ROLE_LABELS[roleCode],
+              status: getStatusLabel(user),
+              lastLogin: formatLastLogin(user?.lastLoginAt || user?.lastLogin || user?.updatedAt),
+            }
+          })
+          .filter(Boolean)
+
+        setAdmins(normalizedAdmins)
+      } catch (loadError) {
+        if (!isAlive) return
+        setAdmins([])
+        setError(loadError instanceof Error ? loadError.message : 'Не удалось загрузить администраторов')
+      } finally {
+        if (isAlive) setIsLoading(false)
+      }
+    }
+
+    loadAdmins()
+
+    return () => {
+      isAlive = false
+    }
+  }, [token])
+
   const filteredAdmins = useMemo(() => {
-    return adminRows.filter((admin) => {
+    return admins.filter((admin) => {
       const query = search.trim().toLowerCase()
       const matchesSearch =
         admin.name.toLowerCase().includes(query) || admin.email.toLowerCase().includes(query)
       const matchesRole = roleFilter === 'Все роли' || admin.role === roleFilter
       return matchesSearch && matchesRole
     })
-  }, [search, roleFilter])
+  }, [admins, search, roleFilter])
+
+  const summary = useMemo(() => {
+    let superAdmins = 0
+    let adminsCount = 0
+    let contentAdmins = 0
+
+    for (const admin of admins) {
+      if (admin.roleCode === 'SUPER_ADMIN') superAdmins += 1
+      if (admin.roleCode === 'ADMIN') adminsCount += 1
+      if (admin.roleCode === 'CONTENT_ADMIN') contentAdmins += 1
+    }
+
+    return {
+      total: admins.length,
+      superAdmins,
+      admins: adminsCount,
+      contentAdmins,
+    }
+  }, [admins])
 
   return (
     <section className="admin-page admins-page">
@@ -74,15 +188,15 @@ function AdminsPage() {
       <div className="admins-summary-grid">
         <article className="admins-summary-card">
           <p>Всего администраторов</p>
-          <strong>3</strong>
+          <strong>{summary.total}</strong>
         </article>
         <article className="admins-summary-card">
           <p>Супер админов</p>
-          <strong className="is-violet">1</strong>
+          <strong className="is-violet">{summary.superAdmins}</strong>
         </article>
         <article className="admins-summary-card">
-          <p>Админов</p>
-          <strong className="is-green">2</strong>
+          <p>Контент-админов</p>
+          <strong>{summary.contentAdmins}</strong>
         </article>
       </div>
 
@@ -101,11 +215,13 @@ function AdminsPage() {
         <select value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)} aria-label="Роль">
           <option>Все роли</option>
           <option>Супер админ</option>
-          <option>Админ</option>
+          <option>Контент-админ</option>
         </select>
       </section>
 
       <section className="admins-table-card">
+        {isLoading ? <div className="users-feedback">Загрузка администраторов...</div> : null}
+        {!isLoading && error ? <div className="users-feedback users-feedback--error">{error}</div> : null}
         <table className="admins-table">
           <thead>
             <tr>
@@ -118,6 +234,11 @@ function AdminsPage() {
             </tr>
           </thead>
           <tbody>
+            {!isLoading && !error && filteredAdmins.length === 0 ? (
+              <tr>
+                <td colSpan={6}>Администраторы не найдены</td>
+              </tr>
+            ) : null}
             {filteredAdmins.map((admin) => (
               <tr key={admin.email}>
                 <td>
@@ -133,7 +254,7 @@ function AdminsPage() {
                   </span>
                 </td>
                 <td>
-                  <span className="admins-status-badge">Активен</span>
+                  <span className="admins-status-badge">{admin.status}</span>
                 </td>
                 <td>{admin.lastLogin}</td>
                 <td>

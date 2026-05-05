@@ -22,7 +22,7 @@
 
 .admin-page-header h1 {
   margin: 0;
-  font-size: 20px;
+  font-size: 28px;
   line-height: 1.15;
   letter-spacing: -0.01em;
   color: #0c1f44;
@@ -80,8 +80,8 @@
 }
 
 .admin-icon {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.85;
@@ -136,9 +136,9 @@
   padding: 0 14px;
   background: transparent;
   color: #2f3f5c;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1;
-  font-weight: 600;
+  font-weight: 500;
   text-align: left;
   cursor: pointer;
   transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
@@ -247,7 +247,6 @@
   grid-template-columns: repeat(4, minmax(170px, 1fr));
   gap: 12px;
 }
-
 .admin-stats-card {
   min-height: 160px;
   padding: 14px;
@@ -257,7 +256,6 @@
   display: flex;
   flex-direction: column;
 }
-
 .admin-stats-row {
   display: flex;
   align-items: flex-start;
@@ -298,7 +296,7 @@
   align-items: center;
   gap: 4px;
   color: #2f9a68;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -365,6 +363,12 @@
   margin-top: 12px;
   display: grid;
   gap: 10px;
+}
+
+.admin-panel-empty {
+  color: #61718c;
+  font-size: 12px;
+  padding: 10px 6px;
 }
 
 .admin-user-row {

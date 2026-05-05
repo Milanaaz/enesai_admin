@@ -22,6 +22,15 @@ function AdminPanelPage() {
     return user.email.split('@')[0]
   }, [user?.email])
 
+  const adminRoleLabel = useMemo(() => {
+    const role = typeof user?.role === 'string' ? user.role.trim().toUpperCase() : ''
+    if (role === 'SUPER_ADMIN') return 'Супер админ'
+    if (role === 'CONTENT_ADMIN') return 'Контент-админ'
+    if (role === 'ADMIN') return 'Админ'
+    if (role === 'USER') return 'Пользователь'
+    return 'Без роли'
+  }, [user?.role])
+
   return (
     <main className={`admin-layout ${isCollapsed ? 'collapsed' : ''}`}>
       <AdminSidebar
@@ -30,11 +39,12 @@ function AdminPanelPage() {
         onToggle={() => setIsCollapsed((value) => !value)}
         onSelectPage={setActivePage}
         adminName={adminName}
+        adminRoleLabel={adminRoleLabel}
         onLogout={logout}
       />
 
       <section className="admin-main">
-        {activePage === 'dashboard' ? <DashboardHome /> : null}
+        {activePage === 'dashboard' ? <DashboardHome onOpenUsersPage={() => setActivePage('users')} /> : null}
         {activePage === 'courses' ? <CoursesPage /> : null}
         {activePage === 'lessons' ? <LessonsPage /> : null}
         {activePage === 'tests' ? <TestsPage /> : null}
@@ -56,7 +66,7 @@ function AdminPanelPage() {
         ].includes(
           activePage,
         ) ? (
-          <DashboardHome />
+          <DashboardHome onOpenUsersPage={() => setActivePage('users')} />
         ) : null}
       </section>
     </main>

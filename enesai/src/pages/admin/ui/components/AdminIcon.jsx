@@ -138,6 +138,20 @@ function AdminIcon({ name, className = '' }) {
           <path d="m7.1 7.1 9.8 9.8" />
         </svg>
       )
+    case 'lock':
+      return (
+        <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
+          <rect x="5" y="10" width="14" height="10" rx="2" />
+          <path d="M8 10V7.5a4 4 0 0 1 8 0V10" />
+        </svg>
+      )
+    case 'unlock':
+      return (
+        <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
+          <rect x="5" y="10" width="14" height="10" rx="2" />
+          <path d="M16 10V7.5a4 4 0 1 0-8 0" />
+        </svg>
+      )
     case 'download':
       return (
         <svg viewBox="0 0 24 24" className={className} aria-hidden="true">

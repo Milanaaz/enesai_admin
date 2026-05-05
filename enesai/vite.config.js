@@ -10,4 +10,13 @@ export default defineConfig({
       },
     }),
   ],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://enesai-backend.onrender.com',
+        changeOrigin: true,
+        secure: true,
+      },
+    },
+  },
 })

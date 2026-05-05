@@ -224,7 +224,7 @@
 
 .certificate-card {
   position: relative;
-  width: min(100%, 600px);
+  width: 1000px;
   background: #f7f4ec;
   border: 3px solid #e8ad10;
   border-radius: 28px;
