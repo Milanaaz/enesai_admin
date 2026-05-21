@@ -229,14 +229,13 @@ function AdminsPage() {
               <th>Email</th>
               <th>Роль</th>
               <th>Статус</th>
-              <th>Последний вход</th>
               <th>Действия</th>
             </tr>
           </thead>
           <tbody>
             {!isLoading && !error && filteredAdmins.length === 0 ? (
               <tr>
-                <td colSpan={6}>Администраторы не найдены</td>
+                <td colSpan={5}>Администраторы не найдены</td>
               </tr>
             ) : null}
             {filteredAdmins.map((admin) => (
@@ -256,7 +255,6 @@ function AdminsPage() {
                 <td>
                   <span className="admins-status-badge">{admin.status}</span>
                 </td>
-                <td>{admin.lastLogin}</td>
                 <td>
                   <div className="admins-actions">
                     <button type="button" aria-label={`Редактировать администратора ${admin.name}`}>

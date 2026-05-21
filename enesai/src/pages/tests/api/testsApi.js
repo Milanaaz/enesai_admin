@@ -10,6 +10,27 @@ function extractMessage(payload, fallback) {
   if (payload && typeof payload === 'object') {
     if (typeof payload.message === 'string' && payload.message.trim()) return payload.message
     if (typeof payload.error === 'string' && payload.error.trim()) return payload.error
+    if (Array.isArray(payload.errors) && payload.errors.length > 0) {
+      const detailed = payload.errors
+        .map((item) => {
+          if (typeof item === 'string') return item
+          if (!item || typeof item !== 'object') return ''
+          const path = typeof item.path === 'string' ? item.path : ''
+          const message = typeof item.message === 'string' ? item.message : ''
+          return [path, message].filter(Boolean).join(': ')
+        })
+        .filter(Boolean)
+        .join('; ')
+
+      if (detailed) return detailed
+    }
+    if (Array.isArray(payload.details) && payload.details.length > 0) {
+      const detailed = payload.details
+        .map((item) => (typeof item === 'string' ? item : ''))
+        .filter(Boolean)
+        .join('; ')
+      if (detailed) return detailed
+    }
   }
   return fallback
 }

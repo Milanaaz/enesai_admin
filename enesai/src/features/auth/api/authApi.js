@@ -5,6 +5,20 @@
 
 const LOGIN_ENDPOINT = '/api/v1/auth/login'
 
+function normalizeRole(rawRole) {
+  const normalized = String(rawRole || '')
+    .trim()
+    .toUpperCase()
+    .replace(/[\s-]+/g, '_')
+  const withoutPrefix = normalized.startsWith('ROLE_') ? normalized.slice(5) : normalized
+
+  if (withoutPrefix === 'SUPER_ADMIN' || withoutPrefix === 'SUPERADMIN') return 'SUPER_ADMIN'
+  if (withoutPrefix === 'CONTENT_ADMIN' || withoutPrefix === 'CONTENTADMIN') return 'CONTENT_ADMIN'
+  if (withoutPrefix === 'ADMIN' || withoutPrefix === 'ADMINISTRATOR') return 'CONTENT_ADMIN'
+  if (withoutPrefix === 'USER') return 'USER'
+  return withoutPrefix || 'USER'
+}
+
 function getErrorMessage(payload, fallbackMessage) {
   if (typeof payload === 'string' && payload.trim()) {
     return payload
@@ -69,7 +83,7 @@ export async function loginRequest({ email, password }) {
   }
 
   const apiUser = authPayload?.user ?? {}
-  const role = typeof apiUser.role === 'string' ? apiUser.role.trim().toLowerCase() : ''
+  const role = normalizeRole(apiUser.role)
 
   return {
     token: accessToken,
@@ -77,7 +91,7 @@ export async function loginRequest({ email, password }) {
     user: {
       ...apiUser,
       email: typeof apiUser.email === 'string' ? apiUser.email : normalizedEmail,
-      role: role || 'user',
+      role,
       name:
         typeof apiUser.name === 'string'
           ? apiUser.name

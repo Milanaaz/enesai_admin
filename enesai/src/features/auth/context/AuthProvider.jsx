@@ -25,6 +25,11 @@ export function AuthProvider({ children }) {
 
     try {
       const nextSession = await loginRequest({ email, password })
+      const role = typeof nextSession?.user?.role === 'string' ? nextSession.user.role.trim().toUpperCase() : ''
+      const isAllowedRole = role === 'SUPER_ADMIN' || role === 'CONTENT_ADMIN'
+      if (!isAllowedRole) {
+        throw new Error('Доступ в админ-панель разрешен только SUPER_ADMIN и CONTENT_ADMIN')
+      }
       writeSession(nextSession, remember)
       setSession(nextSession)
       return true

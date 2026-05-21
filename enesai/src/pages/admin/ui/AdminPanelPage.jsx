@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from 'react'
+﻿import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../../../features/auth/context/AuthProvider.jsx'
 import AdminSidebar from './components/AdminSidebar.jsx'
 import DashboardHome from '../../dashboard/ui/components/DashboardHome.jsx'
@@ -12,10 +12,51 @@ import AdminsPage from '../../admins/ui/AdminsPage.jsx'
 import CertificatesPage from '../../certificates/ui/CertificatesPage.jsx'
 import './admin-panel-page.css'
 
+const SUPER_ADMIN_MENU = [
+  { key: 'dashboard', label: 'Дашборд', icon: 'dashboard' },
+  { key: 'courses', label: 'Курсы', icon: 'book' },
+  { key: 'lessons', label: 'Уроки', icon: 'cap' },
+  { key: 'tests', label: 'Тесты', icon: 'quiz' },
+  { key: 'articles', label: 'Статьи', icon: 'article' },
+  { key: 'dictionary', label: 'Словарь', icon: 'dictionary' },
+  { key: 'users', label: 'Пользователи', icon: 'users' },
+  { key: 'admins', label: 'Администраторы', icon: 'shield' },
+  { key: 'certificates', label: 'Сертификаты', icon: 'certificate' },
+]
+
+const CONTENT_ADMIN_MENU = [
+  { key: 'dashboard', label: 'Дашборд', icon: 'dashboard' },
+  { key: 'courses', label: 'Курсы', icon: 'book' },
+  { key: 'lessons', label: 'Уроки', icon: 'cap' },
+  { key: 'tests', label: 'Тесты', icon: 'quiz' },
+  { key: 'dictionary', label: 'Словарь', icon: 'dictionary' },
+]
+
 function AdminPanelPage() {
   const { user, logout } = useAuth()
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [activePage, setActivePage] = useState('courses')
+  const userRoleCode = useMemo(
+    () => (typeof user?.role === 'string' ? user.role.trim().toUpperCase() : ''),
+    [user?.role],
+  )
+
+  const allowedMenuItems = useMemo(() => {
+    if (userRoleCode === 'CONTENT_ADMIN') return CONTENT_ADMIN_MENU
+    return SUPER_ADMIN_MENU
+  }, [userRoleCode])
+
+  const allowedPageKeys = useMemo(
+    () => new Set(allowedMenuItems.map((item) => item.key)),
+    [allowedMenuItems],
+  )
+
+  useEffect(() => {
+    if (!allowedPageKeys.has(activePage)) {
+      const fallbackPage = allowedMenuItems[0]?.key ?? 'dashboard'
+      setActivePage(fallbackPage)
+    }
+  }, [activePage, allowedMenuItems, allowedPageKeys])
 
   const adminName = useMemo(() => {
     if (!user?.email) return 'Админ'
@@ -23,13 +64,20 @@ function AdminPanelPage() {
   }, [user?.email])
 
   const adminRoleLabel = useMemo(() => {
-    const role = typeof user?.role === 'string' ? user.role.trim().toUpperCase() : ''
-    if (role === 'SUPER_ADMIN') return 'Супер админ'
-    if (role === 'CONTENT_ADMIN') return 'Контент-админ'
-    if (role === 'ADMIN') return 'Админ'
-    if (role === 'USER') return 'Пользователь'
+    if (userRoleCode === 'SUPER_ADMIN') return 'Супер админ'
+    if (userRoleCode === 'CONTENT_ADMIN') return 'Контент-админ'
+    if (userRoleCode === 'ADMIN') return 'Админ'
+    if (userRoleCode === 'USER') return 'Пользователь'
     return 'Без роли'
-  }, [user?.role])
+  }, [userRoleCode])
+
+  const canManageUsers = userRoleCode === 'SUPER_ADMIN'
+
+  const safeOpenUsersPage = () => {
+    if (canManageUsers) {
+      setActivePage('users')
+    }
+  }
 
   return (
     <main className={`admin-layout ${isCollapsed ? 'collapsed' : ''}`}>
@@ -41,36 +89,26 @@ function AdminPanelPage() {
         adminName={adminName}
         adminRoleLabel={adminRoleLabel}
         onLogout={logout}
+        menuItems={allowedMenuItems}
       />
 
       <section className="admin-main">
-        {activePage === 'dashboard' ? <DashboardHome onOpenUsersPage={() => setActivePage('users')} /> : null}
-        {activePage === 'courses' ? <CoursesPage /> : null}
-        {activePage === 'lessons' ? <LessonsPage /> : null}
-        {activePage === 'tests' ? <TestsPage /> : null}
-        {activePage === 'articles' ? <ArticlesPage /> : null}
-        {activePage === 'dictionary' ? <DictionaryPage /> : null}
-        {activePage === 'users' ? <UsersPage /> : null}
-        {activePage === 'admins' ? <AdminsPage /> : null}
-        {activePage === 'certificates' ? <CertificatesPage /> : null}
-        {![
-          'dashboard',
-          'courses',
-          'lessons',
-          'tests',
-          'articles',
-          'dictionary',
-          'users',
-          'admins',
-          'certificates',
-        ].includes(
-          activePage,
-        ) ? (
-          <DashboardHome onOpenUsersPage={() => setActivePage('users')} />
+        {activePage === 'dashboard' && allowedPageKeys.has('dashboard') ? (
+          <DashboardHome onOpenUsersPage={safeOpenUsersPage} />
         ) : null}
+        {activePage === 'courses' && allowedPageKeys.has('courses') ? <CoursesPage /> : null}
+        {activePage === 'lessons' && allowedPageKeys.has('lessons') ? <LessonsPage /> : null}
+        {activePage === 'tests' && allowedPageKeys.has('tests') ? <TestsPage /> : null}
+        {activePage === 'articles' && allowedPageKeys.has('articles') ? <ArticlesPage /> : null}
+        {activePage === 'dictionary' && allowedPageKeys.has('dictionary') ? <DictionaryPage /> : null}
+        {activePage === 'users' && allowedPageKeys.has('users') ? <UsersPage /> : null}
+        {activePage === 'admins' && allowedPageKeys.has('admins') ? <AdminsPage /> : null}
+        {activePage === 'certificates' && allowedPageKeys.has('certificates') ? <CertificatesPage /> : null}
+        {!allowedPageKeys.has(activePage) ? <DashboardHome onOpenUsersPage={safeOpenUsersPage} /> : null}
       </section>
     </main>
   )
 }
 
 export default AdminPanelPage
+

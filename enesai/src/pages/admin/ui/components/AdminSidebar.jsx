@@ -1,17 +1,5 @@
 ﻿import AdminIcon from './AdminIcon.jsx'
 
-const menuItems = [
-  { key: 'dashboard', label: 'Дашборд', icon: 'dashboard' },
-  { key: 'courses', label: 'Курсы', icon: 'book' },
-  { key: 'lessons', label: 'Уроки', icon: 'cap' },
-  { key: 'tests', label: 'Тесты', icon: 'quiz' },
-  { key: 'articles', label: 'Статьи', icon: 'article' },
-  { key: 'dictionary', label: 'Словарь', icon: 'dictionary' },
-  { key: 'users', label: 'Пользователи', icon: 'users' },
-  { key: 'admins', label: 'Администраторы', icon: 'shield' },
-  { key: 'certificates', label: 'Сертификаты', icon: 'certificate' },
-]
-
 function getInitials(name) {
   return name
     .split(' ')
@@ -22,7 +10,16 @@ function getInitials(name) {
     .toUpperCase()
 }
 
-function AdminSidebar({ collapsed, activePage, onToggle, onSelectPage, adminName, adminRoleLabel, onLogout }) {
+function AdminSidebar({
+  collapsed,
+  activePage,
+  onToggle,
+  onSelectPage,
+  adminName,
+  adminRoleLabel,
+  onLogout,
+  menuItems,
+}) {
   return (
     <aside className={`admin-sidebar ${collapsed ? 'collapsed' : ''}`}>
       <div className="admin-sidebar-top">
