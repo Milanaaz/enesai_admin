@@ -1,25 +1,13 @@
-﻿import './styles.css'
-import { AuthProvider, useAuth } from '../features/auth/context/AuthProvider.jsx'
-import LoginPage from '../pages/login/ui/LoginPage.jsx'
-import AdminPanelPage from '../pages/admin/ui/AdminPanelPage.jsx'
-
-function AppContent() {
-  const { isAuthenticated, isHydrating } = useAuth()
-
-  if (isHydrating) {
-    return <div className="app-loading">Загрузка...</div>
-  }
-
-  return isAuthenticated ? <AdminPanelPage /> : <LoginPage />
-}
+import './styles.css'
+import AppProviders from './providers/AppProviders.jsx'
+import AppRouter from './router/AppRouter.jsx'
 
 function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <AppProviders>
+      <AppRouter />
+    </AppProviders>
   )
 }
 
 export default App
-

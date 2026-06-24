@@ -1,9 +1,9 @@
-﻿import { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import { fetchMyProfile, updateMyProfile } from '../../../pages/users/api/usersApi.js'
+﻿import { useEffect, useState } from 'react'
+import { fetchMyProfile, updateMyProfile } from '../../users/api/usersApi.js'
 import { loginRequest } from '../api/authApi.js'
 import { clearSession, readSession, updateStoredSession, writeSession } from '../model/sessionStorage.js'
+import { AuthContext } from './AuthContext.js'
 
-const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null)
@@ -106,30 +106,19 @@ export function AuthProvider({ children }) {
     setError('')
   }
 
-  const value = useMemo(
-    () => ({
-      user: session?.user ?? null,
-      token: session?.token ?? '',
-      isAuthenticated: Boolean(session?.token),
-      isHydrating,
-      isSubmitting,
-      error,
-      login,
-      refreshProfile,
-      saveMyProfile,
-      logout,
-      clearError,
-    }),
-    [session, isHydrating, isSubmitting, error],
-  )
+  const value = {
+    user: session?.user ?? null,
+    token: session?.token ?? '',
+    isAuthenticated: Boolean(session?.token),
+    isHydrating,
+    isSubmitting,
+    error,
+    login,
+    refreshProfile,
+    saveMyProfile,
+    logout,
+    clearError,
+  }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext)
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider')
-  }
-  return context
 }
