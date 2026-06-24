@@ -11,7 +11,12 @@ import {
 import './users-page.css'
 
 const ROLE_OPTIONS = ['USER', 'CONTENT_ADMIN', 'SUPER_ADMIN']
-const GOAL_OPTIONS = ['LEARN_KYRGYZ', 'IMPROVE_GRAMMAR', 'BUSINESS_COMMUNICATION', 'TRAVEL']
+const GOAL_OPTIONS = [
+  { value: 'LEARN_KYRGYZ', label: 'Выучить кыргызский' },
+  { value: 'ORT_PREP', label: 'Подготовка к ОРТ' },
+  { value: 'CONVERSATIONAL', label: 'Разговорный' },
+  { value: 'BUSINESS', label: 'Деловой' },
+]
 
 function getInitial(name) {
   const value = (name || '').trim()
@@ -35,6 +40,13 @@ function buildName(user) {
   if (fullName) return fullName
   if (typeof user.name === 'string' && user.name.trim()) return user.name.trim()
   return 'Без имени'
+}
+
+function formatGoal(goalType) {
+  const value = typeof goalType === 'string' ? goalType.trim() : ''
+  if (!value) return '-'
+
+  return GOAL_OPTIONS.find((goal) => goal.value === value)?.label || value
 }
 
 function normalizeStatus(user) {
@@ -76,6 +88,8 @@ function mapUser(rawUser) {
     email: rawUser.email || '-',
     courses: typeof rawUser.coursesCount === 'number' ? rawUser.coursesCount : 0,
     level: rawUser.languageLevel || '-',
+    goal: formatGoal(rawUser.goalType),
+    goalType: rawUser.goalType || '',
     role: rawUser.role || '-',
     date: formatDate(rawUser.createdAt),
     status,
@@ -137,6 +151,7 @@ function UsersPage() {
       const matchesSearch =
         entry.name.toLowerCase().includes(query) ||
         entry.email.toLowerCase().includes(query) ||
+        entry.goal.toLowerCase().includes(query) ||
         entry.role.toLowerCase().includes(query)
 
       const effectiveStatus = statusOverrideById[entry.id] ?? entry.status
@@ -200,9 +215,7 @@ function UsersPage() {
       await updateUserRoleById({ token, id: selectedUser.id, role: roleDraft })
       setActionInfo('Роль пользователя обновлена')
       await loadUsers()
-      const details = await fetchUserById({ token, id: selectedUser.id })
-      setSelectedUser(details)
-      setRoleDraft(typeof details?.role === 'string' ? details.role : 'USER')
+      closeUserDetails()
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Не удалось обновить роль'
       setActionInfo(message)
@@ -350,6 +363,7 @@ function UsersPage() {
                   <th>Email</th>
                   <th>Курсов</th>
                   <th>Уровень</th>
+                  <th>Цель</th>
                   <th>Статус</th>
                   <th>Роль</th>
                   <th>Дата регистрации</th>
@@ -370,6 +384,7 @@ function UsersPage() {
                     <td>
                       <span className="users-level-badge">{entry.level}</span>
                     </td>
+                    <td>{entry.goal}</td>
                     <td>
                       {(() => {
                         const effectiveStatus = statusOverrideById[entry.id] ?? entry.status
@@ -420,7 +435,7 @@ function UsersPage() {
 
       {selectedUser || isDetailsLoading ? (
         <div className="users-modal-overlay" role="dialog" aria-modal="true" aria-label="Редактирование пользователя">
-          <div className="users-modal">
+          <div className="users-modal users-details-modal">
             <header className="users-modal-header">
               <h2>Пользователь</h2>
               <button type="button" className="users-modal-close" onClick={closeUserDetails}>
@@ -431,21 +446,63 @@ function UsersPage() {
             {isDetailsLoading ? <div className="users-feedback">Загрузка...</div> : null}
 
             {selectedUser ? (
-              <div className="users-modal-body">
-                <p><strong>Email:</strong> {selectedUser.email || '-'}</p>
-                <p><strong>Имя:</strong> {buildName(selectedUser)}</p>
-                <p><strong>Текущая роль:</strong> {selectedUser.role || '-'}</p>
+              <div className="users-modal-body users-details-body">
+                <div className="users-details-profile">
+                  <span className="users-avatar users-details-avatar">{getInitial(buildName(selectedUser))}</span>
+                  <div className="users-details-heading">
+                    <strong>{buildName(selectedUser)}</strong>
+                    <span>{selectedUser.email || '-'}</span>
+                  </div>
+                </div>
 
-                <label className="users-modal-label" htmlFor="role-select">Новая роль</label>
-                <select id="role-select" value={roleDraft} onChange={(event) => setRoleDraft(event.target.value)}>
-                  {ROLE_OPTIONS.map((role) => (
-                    <option key={role} value={role}>{role}</option>
-                  ))}
-                </select>
+                <div className="users-details-grid">
+                  <div className="users-details-item">
+                    <span>Цель</span>
+                    <strong>{formatGoal(selectedUser.goalType)}</strong>
+                  </div>
+                  <div className="users-details-item">
+                    <span>Уровень</span>
+                    <strong>{selectedUser.languageLevel || '-'}</strong>
+                  </div>
+                  <div className="users-details-item">
+                    <span>Статус</span>
+                    {(() => {
+                      const status = normalizeStatus(selectedUser)
+                      return (
+                        <strong
+                          className={`users-status-badge ${
+                            status.key === 'active'
+                              ? 'is-active'
+                              : status.key === 'inactive'
+                                ? 'is-inactive'
+                                : 'is-blocked'
+                          }`}
+                        >
+                          {status.label}
+                        </strong>
+                      )
+                    })()}
+                  </div>
+                  <div className="users-details-item">
+                    <span>Текущая роль</span>
+                    <strong>{selectedUser.role || '-'}</strong>
+                  </div>
+                </div>
 
-                <button type="button" className="users-profile-btn" onClick={saveUserRole} disabled={isRoleSaving}>
-                  {isRoleSaving ? 'Сохраняем...' : 'Сохранить роль'}
-                </button>
+                <div className="users-role-editor">
+                  <label className="users-modal-label" htmlFor="role-select">Новая роль</label>
+                  <div className="users-role-row">
+                    <select id="role-select" value={roleDraft} onChange={(event) => setRoleDraft(event.target.value)}>
+                      {ROLE_OPTIONS.map((role) => (
+                        <option key={role} value={role}>{role}</option>
+                      ))}
+                    </select>
+
+                    <button type="button" className="users-profile-btn" onClick={saveUserRole} disabled={isRoleSaving}>
+                      {isRoleSaving ? 'Сохраняем...' : 'Сохранить роль'}
+                    </button>
+                  </div>
+                </div>
               </div>
             ) : null}
           </div>
@@ -478,7 +535,7 @@ function UsersPage() {
               <label className="users-modal-label" htmlFor="goal-type">Цель</label>
               <select id="goal-type" value={profileForm.goalType} onChange={(event) => setProfileForm((prev) => ({ ...prev, goalType: event.target.value }))}>
                 {GOAL_OPTIONS.map((goal) => (
-                  <option key={goal} value={goal}>{goal}</option>
+                  <option key={goal.value} value={goal.value}>{goal.label}</option>
                 ))}
               </select>
 

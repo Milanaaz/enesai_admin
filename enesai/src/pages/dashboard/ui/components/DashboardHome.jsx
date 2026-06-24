@@ -1,42 +1,16 @@
-﻿import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../../../../features/auth/context/AuthProvider.jsx'
+import { fetchMyCertificates } from '../../../certificates/api/certificatesApi.js'
+import { fetchAdminCourses } from '../../../courses/api/adminCoursesApi.js'
 import { fetchAllUsers } from '../../../users/api/usersApi.js'
 import AdminIcon from '../../../admin/ui/components/AdminIcon.jsx'
+import { fetchMyAnalytics } from '../../api/dashboardApi.js'
 
-const stats = [
-  {
-    title: 'Всего пользователей',
-    value: null,
-    growth: null,
-    icon: 'users',
-    variant: 'violet',
-  },
-  {
-    title: 'Активных курсов',
-    value: '24',
-    growth: '+3',
-    icon: 'book',
-    variant: 'rose',
-  },
-  {
-    title: 'Завершенных уроков',
-    value: '15,678',
-    growth: '+8.2%',
-    icon: 'cap',
-    variant: 'mint',
-  },
-  {
-    title: 'Выданных сертификатов',
-    value: '456',
-    growth: '+15',
-    icon: 'certificate',
-    variant: 'amber',
-  },
-]
-
-const courses = [
-  { title: 'Основы кыргызского языка', students: 1234, progress: '78% завершение', rating: '4.8' },
-  { title: 'Разговорная практика', students: 856, progress: '65% завершение', rating: '4.9' },
+const STAT_CONFIG = [
+  { title: 'Всего пользователей', key: 'totalUsers', icon: 'users', variant: 'violet' },
+  { title: 'Активных курсов', key: 'activeCourses', icon: 'book', variant: 'rose' },
+  { title: 'Завершенных уроков', key: 'completedLessons', icon: 'cap', variant: 'mint' },
+  { title: 'Выданных сертификатов', key: 'issuedCertificates', icon: 'certificate', variant: 'amber' },
 ]
 
 function getInitials(name) {
@@ -68,6 +42,42 @@ function formatDate(isoDate) {
   }).format(date)
 }
 
+function formatNumber(value) {
+  const number = Number(value)
+  if (!Number.isFinite(number)) return '0'
+  return new Intl.NumberFormat('ru-RU').format(number)
+}
+
+function formatGrowth(value) {
+  const number = Number(value)
+  if (!Number.isFinite(number)) return ''
+  return `${number >= 0 ? '+' : ''}${number.toFixed(number % 1 === 0 ? 0 : 1)}%`
+}
+
+function calculateGrowth(currentCount, previousCount) {
+  if (previousCount === 0) return currentCount > 0 ? 100 : 0
+  return ((currentCount - previousCount) / previousCount) * 100
+}
+
+function countCreatedInRanges(rows, dateField = 'createdAt') {
+  const now = new Date()
+  const msInDay = 24 * 60 * 60 * 1000
+  const currentStart = now.getTime() - 30 * msInDay
+  const previousStart = now.getTime() - 60 * msInDay
+  let currentCount = 0
+  let previousCount = 0
+
+  for (const row of rows) {
+    const createdAtMs = new Date(row?.[dateField] || 0).getTime()
+    if (!Number.isFinite(createdAtMs) || createdAtMs <= 0) continue
+
+    if (createdAtMs >= currentStart) currentCount += 1
+    else if (createdAtMs >= previousStart && createdAtMs < currentStart) previousCount += 1
+  }
+
+  return { currentCount, previousCount }
+}
+
 function normalizeStatus(user) {
   const rawStatus =
     typeof user.status === 'string'
@@ -93,100 +103,135 @@ function normalizeStatus(user) {
   return { label: 'Активен', className: 'active' }
 }
 
-function DashboardHome({ onOpenUsersPage }) {
+function normalizeCourse(rawCourse) {
+  const rating = Number(rawCourse?.rating)
+  const ratingCount = Number(rawCourse?.ratingCount)
+  const totalLessons = Number(rawCourse?.totalLessons)
+  const totalModules = Number(rawCourse?.totalModules)
+
+  return {
+    id: rawCourse?.id || rawCourse?.title,
+    title: rawCourse?.title || 'Без названия',
+    status: rawCourse?.status || '',
+    rating: Number.isFinite(rating) ? rating : 0,
+    ratingCount: Number.isFinite(ratingCount) ? ratingCount : 0,
+    totalLessons: Number.isFinite(totalLessons) ? totalLessons : 0,
+    totalModules: Number.isFinite(totalModules) ? totalModules : 0,
+  }
+}
+
+function readSettledValue(result, fallback) {
+  return result.status === 'fulfilled' ? result.value : fallback
+}
+
+function DashboardHome({ onOpenUsersPage, onOpenCoursesPage }) {
   const { token } = useAuth()
   const [latestUsers, setLatestUsers] = useState([])
-  const [totalUsers, setTotalUsers] = useState(0)
-  const [usersGrowth, setUsersGrowth] = useState('0.0%')
-  const [usersError, setUsersError] = useState('')
+  const [popularCourses, setPopularCourses] = useState([])
+  const [dashboardStats, setDashboardStats] = useState({
+    totalUsers: 0,
+    activeCourses: 0,
+    completedLessons: 0,
+    issuedCertificates: 0,
+  })
+  const [growthByKey, setGrowthByKey] = useState({})
+  const [dashboardError, setDashboardError] = useState('')
+  const [coursesError, setCoursesError] = useState('')
 
   useEffect(() => {
     let isAlive = true
 
-    const loadLatestUsers = async () => {
-      setUsersError('')
+    const loadDashboard = async () => {
+      setDashboardError('')
+      setCoursesError('')
 
-      try {
-        const allUsers = await fetchAllUsers({ token })
-        if (isAlive) {
-          setTotalUsers(allUsers.length)
-        }
+      const [usersResult, coursesResult, analyticsResult, certificatesResult] = await Promise.allSettled([
+        fetchAllUsers({ token }),
+        fetchAdminCourses({ token }),
+        fetchMyAnalytics({ token }),
+        fetchMyCertificates({ token }),
+      ])
 
-        const now = new Date()
-        const msInDay = 24 * 60 * 60 * 1000
-        const currentStart = now.getTime() - 30 * msInDay
-        const previousStart = now.getTime() - 60 * msInDay
-        let currentCount = 0
-        let previousCount = 0
+      if (!isAlive) return
 
-        for (const user of allUsers) {
-          const createdAtMs = new Date(user?.createdAt || 0).getTime()
-          if (!Number.isFinite(createdAtMs) || createdAtMs <= 0) continue
+      const allUsers = readSettledValue(usersResult, [])
+      const courses = readSettledValue(coursesResult, []).map(normalizeCourse)
+      const analytics = readSettledValue(analyticsResult, {}) ?? {}
+      const certificates = readSettledValue(certificatesResult, [])
 
-          if (createdAtMs >= currentStart) currentCount += 1
-          else if (createdAtMs >= previousStart && createdAtMs < currentStart) previousCount += 1
-        }
-
-        const growthValue =
-          previousCount === 0
-            ? currentCount > 0
-              ? 100
-              : 0
-            : ((currentCount - previousCount) / previousCount) * 100
-        const growthLabel = `${growthValue >= 0 ? '+' : ''}${growthValue.toFixed(1)}%`
-        if (isAlive) {
-          setUsersGrowth(growthLabel)
-        }
-
-        const sortedUsers = [...allUsers].sort((a, b) => {
-          const dateA = new Date(a?.createdAt || 0).getTime()
-          const dateB = new Date(b?.createdAt || 0).getTime()
-          return dateB - dateA
-        })
-
-        const topUsers = sortedUsers.slice(0, 4).map((user) => {
-          const status = normalizeStatus(user)
-          return {
-            id: user.id || user.email,
-            name: buildName(user),
-            email: user.email || '-',
-            statusLabel: status.label,
-            statusClassName: status.className,
-            date: formatDate(user.createdAt),
-          }
-        })
-
-        if (isAlive) {
-          setLatestUsers(topUsers)
-        }
-      } catch (err) {
-        if (isAlive) {
-          setLatestUsers([])
-          setUsersError(err instanceof Error ? err.message : 'Не удалось загрузить новых пользователей')
-        }
+      if (usersResult.status === 'rejected') {
+        setDashboardError(usersResult.reason instanceof Error ? usersResult.reason.message : 'Не удалось загрузить пользователей')
       }
+      if (coursesResult.status === 'rejected') {
+        setCoursesError(coursesResult.reason instanceof Error ? coursesResult.reason.message : 'Не удалось загрузить курсы')
+      }
+
+      const sortedUsers = [...allUsers].sort((a, b) => {
+        const dateA = new Date(a?.createdAt || 0).getTime()
+        const dateB = new Date(b?.createdAt || 0).getTime()
+        return dateB - dateA
+      })
+
+      const topUsers = sortedUsers.slice(0, 5).map((user) => {
+        const status = normalizeStatus(user)
+        return {
+          id: user.id || user.email,
+          name: buildName(user),
+          email: user.email || '-',
+          statusLabel: status.label,
+          statusClassName: status.className,
+          date: formatDate(user.createdAt),
+        }
+      })
+
+      const sortedCourses = [...courses]
+        .sort((a, b) => {
+          if (b.rating !== a.rating) return b.rating - a.rating
+          if (b.ratingCount !== a.ratingCount) return b.ratingCount - a.ratingCount
+          return b.totalLessons - a.totalLessons
+        })
+        .slice(0, 4)
+
+      const activeCourses = courses.filter((course) => course.status === 'PUBLISHED').length
+      const lessonsFromCourses = courses.reduce((sum, course) => sum + course.totalLessons, 0)
+      const issuedCertificates =
+        typeof analytics.certificatesEarned === 'number'
+          ? analytics.certificatesEarned
+          : certificates.filter((certificate) => certificate?.status !== 'REVOKED').length
+      const completedLessons =
+        typeof analytics.lessonsCompleted === 'number' ? analytics.lessonsCompleted : lessonsFromCourses
+      const userRanges = countCreatedInRanges(allUsers)
+
+      setLatestUsers(topUsers)
+      setPopularCourses(sortedCourses)
+      setDashboardStats({
+        totalUsers: allUsers.length,
+        activeCourses,
+        completedLessons,
+        issuedCertificates,
+      })
+      setGrowthByKey({
+        totalUsers: formatGrowth(calculateGrowth(userRanges.currentCount, userRanges.previousCount)),
+      })
     }
 
-    loadLatestUsers()
+    loadDashboard()
     return () => {
       isAlive = false
     }
   }, [token])
 
   const statsCards = useMemo(() => {
-    return stats.map((card) => {
-      if (card.title !== 'Всего пользователей') return card
-      return {
-        ...card,
-        value: new Intl.NumberFormat('ru-RU').format(totalUsers),
-        growth: usersGrowth,
-      }
-    })
-  }, [totalUsers, usersGrowth])
+    return STAT_CONFIG.map((card) => ({
+      ...card,
+      value: formatNumber(dashboardStats[card.key]),
+      growth: growthByKey[card.key] || '',
+    }))
+  }, [dashboardStats, growthByKey])
 
   const usersContent = useMemo(() => {
-    if (usersError) {
-      return <div className="admin-panel-empty">{usersError}</div>
+    if (dashboardError) {
+      return <div className="admin-panel-empty">{dashboardError}</div>
     }
 
     if (latestUsers.length === 0) {
@@ -210,7 +255,34 @@ function DashboardHome({ onOpenUsersPage }) {
         </div>
       </div>
     ))
-  }, [latestUsers, usersError])
+  }, [dashboardError, latestUsers])
+
+  const coursesContent = useMemo(() => {
+    if (coursesError) {
+      return <div className="admin-panel-empty">{coursesError}</div>
+    }
+
+    if (popularCourses.length === 0) {
+      return <div className="admin-panel-empty">Курсы не найдены</div>
+    }
+
+    return popularCourses.map((course) => (
+      <div key={course.id || course.title} className="admin-course-row">
+        <div className="admin-course-main">
+          <h3>{course.title}</h3>
+          <p>
+            <AdminIcon name="users" className="admin-icon admin-users-mini-icon" /> {formatNumber(course.ratingCount)}{' '}
+            оценок
+            <span>{formatNumber(course.totalLessons)} уроков</span>
+          </p>
+        </div>
+        <div className="admin-course-rating">
+          <strong>{course.rating.toFixed(1)}</strong>
+          <AdminIcon name="star" className="admin-icon" />
+        </div>
+      </div>
+    ))
+  }, [coursesError, popularCourses])
 
   return (
     <section className="admin-page">
@@ -227,8 +299,12 @@ function DashboardHome({ onOpenUsersPage }) {
                 <AdminIcon name={card.icon} className="admin-icon" />
               </div>
               <p className="admin-stats-growth">
-                <AdminIcon name="trend" className="admin-icon" />
-                {card.growth}
+                {card.growth ? (
+                  <>
+                    <AdminIcon name="trend" className="admin-icon" />
+                    {card.growth}
+                  </>
+                ) : null}
               </p>
             </div>
             <p className="admin-stats-title">{card.title}</p>
@@ -254,28 +330,13 @@ function DashboardHome({ onOpenUsersPage }) {
         <article className="admin-panel-card">
           <header className="admin-panel-header">
             <h2>Популярные курсы</h2>
-            <button type="button" className="admin-panel-link">
+            <button type="button" className="admin-panel-link" onClick={onOpenCoursesPage}>
               Все курсы
               <span>→</span>
             </button>
           </header>
           <div className="admin-panel-list">
-            {courses.map((course) => (
-              <div key={course.title} className="admin-course-row">
-                <div className="admin-course-main">
-                  <h3>{course.title}</h3>
-                  <p>
-                    <AdminIcon name="users" className="admin-icon admin-users-mini-icon" /> {course.students}{' '}
-                    студентов
-                    <span>{course.progress}</span>
-                  </p>
-                </div>
-                <div className="admin-course-rating">
-                  <strong>{course.rating}</strong>
-                  <AdminIcon name="star" className="admin-icon" />
-                </div>
-              </div>
-            ))}
+            {coursesContent}
           </div>
         </article>
       </div>

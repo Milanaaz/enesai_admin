@@ -2,7 +2,7 @@
   margin: 0;
   font-size: 28px;
   line-height: 1.1;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
   color: #0c1f44;
 }
 
@@ -258,6 +258,10 @@
   overflow: hidden;
 }
 
+.users-details-modal {
+  width: min(100%, 560px);
+}
+
 .users-modal-header {
   display: flex;
   align-items: center;
@@ -284,10 +288,108 @@
   cursor: pointer;
 }
 
+.users-modal-close:hover {
+  background: #eef2f8;
+}
+
 .users-modal-body {
   padding: 16px;
   display: grid;
-  gap: 1px;
+  gap: 10px;
+}
+
+.users-details-body {
+  padding: 18px;
+  gap: 16px;
+}
+
+.users-details-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #e1e7f0;
+  border-radius: 14px;
+  background: #f8faff;
+}
+
+.users-details-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  font-size: 22px;
+  flex: 0 0 auto;
+}
+
+.users-details-heading {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.users-details-heading strong {
+  color: #0d2146;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.users-details-heading span {
+  color: #5d6d86;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.users-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.users-details-item {
+  min-height: 74px;
+  padding: 12px;
+  border: 1px solid #e1e7f0;
+  border-radius: 12px;
+  background: #fff;
+  display: grid;
+  align-content: center;
+  gap: 7px;
+}
+
+.users-details-item span {
+  color: #687892;
+  font-size: 12px;
+}
+
+.users-details-item strong {
+  color: #172947;
+  font-size: 14px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.users-details-item .users-status-badge {
+  width: max-content;
+}
+
+.users-role-editor {
+  padding: 14px;
+  border: 1px solid #d7dfea;
+  border-radius: 14px;
+  background: #fbfcfe;
+  display: grid;
+  gap: 8px;
+}
+
+.users-role-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+}
+
+.users-role-row .users-profile-btn {
+  height: 38px;
+  white-space: nowrap;
 }
 
 .users-modal-label {
@@ -319,7 +421,7 @@
   }
 
   .users-table {
-    min-width: 980px;
+    min-width: 1080px;
   }
 }
 
@@ -334,5 +436,14 @@
 
   .users-summary-grid {
     grid-template-columns: 1fr;
+  }
+
+  .users-details-grid,
+  .users-role-row {
+    grid-template-columns: 1fr;
+  }
+
+  .users-role-row .users-profile-btn {
+    width: 100%;
   }
 }

@@ -17,7 +17,7 @@ const SUPER_ADMIN_MENU = [
   { key: 'courses', label: 'Курсы', icon: 'book' },
   { key: 'lessons', label: 'Уроки', icon: 'cap' },
   { key: 'tests', label: 'Тесты', icon: 'quiz' },
-  { key: 'articles', label: 'Статьи', icon: 'article' },
+  { key: 'articles', label: 'Библиотека', icon: 'article' },
   { key: 'dictionary', label: 'Словарь', icon: 'dictionary' },
   { key: 'users', label: 'Пользователи', icon: 'users' },
   { key: 'admins', label: 'Администраторы', icon: 'shield' },
@@ -29,6 +29,7 @@ const CONTENT_ADMIN_MENU = [
   { key: 'courses', label: 'Курсы', icon: 'book' },
   { key: 'lessons', label: 'Уроки', icon: 'cap' },
   { key: 'tests', label: 'Тесты', icon: 'quiz' },
+  { key: 'articles', label: 'Библиотека', icon: 'article' },
   { key: 'dictionary', label: 'Словарь', icon: 'dictionary' },
 ]
 
@@ -79,6 +80,10 @@ function AdminPanelPage() {
     }
   }
 
+  const openCoursesPage = () => {
+    setActivePage('courses')
+  }
+
   return (
     <main className={`admin-layout ${isCollapsed ? 'collapsed' : ''}`}>
       <AdminSidebar
@@ -94,7 +99,7 @@ function AdminPanelPage() {
 
       <section className="admin-main">
         {activePage === 'dashboard' && allowedPageKeys.has('dashboard') ? (
-          <DashboardHome onOpenUsersPage={safeOpenUsersPage} />
+          <DashboardHome onOpenUsersPage={safeOpenUsersPage} onOpenCoursesPage={openCoursesPage} />
         ) : null}
         {activePage === 'courses' && allowedPageKeys.has('courses') ? <CoursesPage /> : null}
         {activePage === 'lessons' && allowedPageKeys.has('lessons') ? <LessonsPage /> : null}
@@ -104,7 +109,9 @@ function AdminPanelPage() {
         {activePage === 'users' && allowedPageKeys.has('users') ? <UsersPage /> : null}
         {activePage === 'admins' && allowedPageKeys.has('admins') ? <AdminsPage /> : null}
         {activePage === 'certificates' && allowedPageKeys.has('certificates') ? <CertificatesPage /> : null}
-        {!allowedPageKeys.has(activePage) ? <DashboardHome onOpenUsersPage={safeOpenUsersPage} /> : null}
+        {!allowedPageKeys.has(activePage) ? (
+          <DashboardHome onOpenUsersPage={safeOpenUsersPage} onOpenCoursesPage={openCoursesPage} />
+        ) : null}
       </section>
     </main>
   )
