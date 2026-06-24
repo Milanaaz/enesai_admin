@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../../auth/context/useAuth.js'
 import AdminIcon from '../../../shared/ui/AdminIcon.jsx'
+import Toast from '../../../shared/ui/Toast/Toast.jsx'
 import {
   addPlacementQuestion,
   createPlacementTest,
@@ -763,8 +764,8 @@ function TestsManager() {
 
           <section className="tests-table-card">
             {isLoading ? <div className="tests-feedback">Загрузка вопросов...</div> : null}
-            {!isLoading && error ? <div className="tests-feedback tests-feedback--error app-toast">{error}</div> : null}
-            {info ? <div className="tests-feedback app-toast">{info}</div> : null}
+            {!isLoading && error ? <Toast message={error} tone="error" onClose={() => setError('')} /> : null}
+            {info ? <Toast message={info} onClose={() => setInfo('')} /> : null}
             {!isLoading && !error ? (
               questions.length > 0 ? (
                 <table className="tests-table">

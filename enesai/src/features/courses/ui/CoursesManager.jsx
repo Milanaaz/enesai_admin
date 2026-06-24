@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../../auth/context/useAuth.js'
 import AdminIcon from '../../../shared/ui/AdminIcon.jsx'
+import Toast from '../../../shared/ui/Toast/Toast.jsx'
 import {
   addAdminLessonWord,
   archiveAdminCourse,
@@ -601,8 +602,8 @@ function CoursesManager() {
         </select>
       </section>
 
-      {error ? <div className="courses-feedback courses-feedback--error app-toast">{error}</div> : null}
-      {info ? <div className="courses-feedback app-toast">{info}</div> : null}
+      {error ? <Toast message={error} tone="error" onClose={() => setError('')} /> : null}
+      {info ? <Toast message={info} onClose={() => setInfo('')} /> : null}
 
       <div className="courses-lms-layout">
         <aside className="courses-tree-panel">

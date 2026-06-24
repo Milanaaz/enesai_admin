@@ -36,6 +36,16 @@ export async function createAdminWord({ token, payload }) {
   })
 }
 
+export async function createAdminWordsBulk({ token, payload }) {
+  return apiRequest({
+    token,
+    path: '/api/v1/admin/words/bulk',
+    method: 'POST',
+    body: payload,
+    fallbackError: 'Не удалось загрузить слова',
+  })
+}
+
 export async function updateAdminWord({ token, wordId, payload }) {
   if (!wordId) throw new Error('ID слова не указан')
   return apiRequest({

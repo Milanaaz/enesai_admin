@@ -35,6 +35,25 @@
   cursor: pointer;
 }
 
+.dictionary-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dictionary-secondary-btn {
+  margin-top: 4px;
+  height: 38px;
+  border: 1px solid #cfd6e2;
+  border-radius: 14px;
+  padding: 0 16px;
+  background: #ffffff;
+  color: #1b2f53;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .dictionary-summary-grid {
   margin-top: 14px;
   display: grid;
@@ -324,7 +343,8 @@
 }
 
 .dictionary-form-grid input,
-.dictionary-form-grid select {
+.dictionary-form-grid select,
+.dictionary-bulk-field textarea {
   width: 100%;
   border: 1px solid #ccd5e3;
   border-radius: 10px;
@@ -332,6 +352,22 @@
   background: #ffffff;
   color: #142848;
   font: inherit;
+}
+
+.dictionary-bulk-field {
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+  color: #344966;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.dictionary-bulk-field textarea {
+  resize: vertical;
+  min-height: 260px;
+  font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+  line-height: 1.45;
 }
 
 .dictionary-form-full {

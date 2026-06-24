@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../../auth/context/useAuth.js'
 import AdminIcon from '../../../shared/ui/AdminIcon.jsx'
+import Toast from '../../../shared/ui/Toast/Toast.jsx'
 import {
   createAdminWord,
+  createAdminWordsBulk,
   deleteAdminWord,
   fetchPlatformWords,
   updateAdminWord,
@@ -39,6 +41,20 @@ function toWordPayload(form) {
   }
 }
 
+const BULK_WORDS_EXAMPLE = `[
+  {
+    "word": "салам",
+    "translation": "привет",
+    "transcription": "",
+    "exampleKg": "Салам!",
+    "exampleRu": "Привет!",
+    "audioUrl": "",
+    "level": "A1",
+    "topic": "приветствие",
+    "synonyms": ""
+  }
+]`
+
 function DictionaryManager() {
   const { token } = useAuth()
   const [words, setWords] = useState([])
@@ -51,6 +67,7 @@ function DictionaryManager() {
   const [busy, setBusy] = useState('')
   const [modal, setModal] = useState(null)
   const [wordForm, setWordForm] = useState(emptyWordForm)
+  const [bulkDraft, setBulkDraft] = useState(BULK_WORDS_EXAMPLE)
 
   const loadWords = useCallback(async () => {
     setBusy('load')
@@ -93,6 +110,11 @@ function DictionaryManager() {
     setModal({ mode: 'create' })
   }
 
+  const openBulkModal = () => {
+    setBulkDraft(BULK_WORDS_EXAMPLE)
+    setModal({ mode: 'bulk' })
+  }
+
   const openEditModal = (word) => {
     setWordForm({
       word: word.word || '',
@@ -130,6 +152,34 @@ function DictionaryManager() {
     }
   }
 
+  const saveWordsBulk = async (event) => {
+    event.preventDefault()
+    setBusy('bulk-save')
+    setError('')
+    setInfo('')
+
+    try {
+      const parsed = JSON.parse(bulkDraft)
+      if (!Array.isArray(parsed) || parsed.length === 0) {
+        throw new Error('Добавьте JSON-массив слов')
+      }
+
+      const payload = parsed.map((item) => toWordPayload({
+        ...emptyWordForm(),
+        ...item,
+      }))
+
+      await createAdminWordsBulk({ token, payload })
+      setInfo(`Загружено слов: ${payload.length}`)
+      setModal(null)
+      await loadWords()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Не удалось загрузить слова')
+    } finally {
+      setBusy('')
+    }
+  }
+
   const removeWord = async (word) => {
     if (!window.confirm(`Удалить слово "${word.word}"?`)) return
     setBusy(`delete:${word.id}`)
@@ -154,10 +204,15 @@ function DictionaryManager() {
           <p>Глобальный словарь платформы: создание, редактирование и удаление слов</p>
         </div>
 
-        <button type="button" className="dictionary-create-btn" onClick={openCreateModal}>
-          <AdminIcon name="plus" className="admin-icon" />
-          Добавить слово
-        </button>
+        <div className="dictionary-header-actions">
+          <button type="button" className="dictionary-secondary-btn" onClick={openBulkModal}>
+            Массово
+          </button>
+          <button type="button" className="dictionary-create-btn" onClick={openCreateModal}>
+            <AdminIcon name="plus" className="admin-icon" />
+            Добавить слово
+          </button>
+        </div>
       </header>
 
       <div className="dictionary-summary-grid">
@@ -208,8 +263,8 @@ function DictionaryManager() {
         </datalist>
       </section>
 
-      {error ? <div className="dictionary-feedback dictionary-feedback--error app-toast">{error}</div> : null}
-      {info ? <div className="dictionary-feedback app-toast">{info}</div> : null}
+      {error ? <Toast message={error} tone="error" onClose={() => setError('')} /> : null}
+      {info ? <Toast message={info} onClose={() => setInfo('')} /> : null}
 
       <section className="dictionary-table-card">
         {busy === 'load' ? <div className="dictionary-empty">Загрузка слов...</div> : null}
@@ -219,7 +274,7 @@ function DictionaryManager() {
             <thead>
               <tr>
                 <th>Кыргызский</th>
-                <th>� усский</th>
+                <th>Русский</th>
                 <th>Уровень</th>
                 <th>Тема</th>
                 <th>Пример</th>
@@ -246,7 +301,7 @@ function DictionaryManager() {
                   </td>
                   <td>
                     <div className="dictionary-actions">
-                      <button type="button" onClick={() => openEditModal(word)} aria-label={`� едактировать слово ${word.word}`}>
+                      <button type="button" onClick={() => openEditModal(word)} aria-label={`Редактировать слово ${word.word}`}>
                         <AdminIcon name="edit" className="admin-icon" />
                       </button>
                       <button type="button" onClick={() => removeWord(word)} aria-label={`Удалить слово ${word.word}`} className="is-danger" disabled={busy === `delete:${word.id}`}>
@@ -261,11 +316,36 @@ function DictionaryManager() {
         ) : null}
       </section>
 
-      {modal ? (
+      {modal?.mode === 'bulk' ? (
+        <div className="dictionary-modal-overlay" role="dialog" aria-modal="true">
+          <form className="dictionary-modal" onSubmit={saveWordsBulk}>
+            <header className="dictionary-modal-header">
+              <h2>Массовая загрузка слов</h2>
+              <button type="button" onClick={() => setModal(null)} aria-label="Закрыть">x</button>
+            </header>
+            <label className="dictionary-form-full dictionary-bulk-field">
+              JSON-массив слов
+              <textarea
+                rows={14}
+                value={bulkDraft}
+                onChange={(event) => setBulkDraft(event.target.value)}
+                spellCheck={false}
+              />
+            </label>
+            <footer className="dictionary-modal-footer">
+              <button type="submit" className="dictionary-create-btn" disabled={busy === 'bulk-save'}>
+                Загрузить
+              </button>
+            </footer>
+          </form>
+        </div>
+      ) : null}
+
+      {modal && modal.mode !== 'bulk' ? (
         <div className="dictionary-modal-overlay" role="dialog" aria-modal="true">
           <form className="dictionary-modal" onSubmit={saveWord}>
             <header className="dictionary-modal-header">
-              <h2>{modal.mode === 'edit' ? '� едактировать слово' : 'Добавить слово'}</h2>
+              <h2>{modal.mode === 'edit' ? 'Редактировать слово' : 'Добавить слово'}</h2>
               <button type="button" onClick={() => setModal(null)} aria-label="Закрыть">x</button>
             </header>
             <div className="dictionary-form-grid">

@@ -1,3 +1,9 @@
+const BOOK_STATUS_LABELS = {
+  DRAFT: 'Черновик',
+  PUBLISHED: 'Опубликована',
+  ARCHIVED: 'Архив',
+}
+
 function BooksTable({ books, busy, onOpenBook }) {
   return (
     <section className="articles-table-card">
@@ -10,6 +16,7 @@ function BooksTable({ books, busy, onOpenBook }) {
               <th>Книга</th>
               <th>Автор</th>
               <th>Уровень</th>
+              <th>Статус</th>
               <th>Жанр</th>
               <th>Страниц</th>
             </tr>
@@ -20,6 +27,7 @@ function BooksTable({ books, busy, onOpenBook }) {
                 <td className="article-name-cell">{book.title}</td>
                 <td>{book.author || '-'}</td>
                 <td><span className="article-status-badge is-draft">{book.level}</span></td>
+                <td>{BOOK_STATUS_LABELS[book.status] || book.status || '-'}</td>
                 <td>{book.genre || '-'}</td>
                 <td>{book.totalPages || 0}</td>
               </tr>

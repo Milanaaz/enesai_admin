@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../../auth/context/useAuth.js'
 import AdminIcon from '../../../shared/ui/AdminIcon.jsx'
+import Toast from '../../../shared/ui/Toast/Toast.jsx'
 import {
   blockUserById,
   fetchAllUsers,
@@ -96,7 +97,7 @@ function mapUser(rawUser) {
 }
 
 function UsersManager() {
-  const { token, refreshProfile, saveMyProfile } = useAuth()
+  const { token } = useAuth()
 
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -112,17 +113,6 @@ function UsersManager() {
   const [roleDraft, setRoleDraft] = useState('USER')
   const [isDetailsLoading, setIsDetailsLoading] = useState(false)
   const [isRoleSaving, setIsRoleSaving] = useState(false)
-
-  const [isProfileOpen, setIsProfileOpen] = useState(false)
-  const [profileForm, setProfileForm] = useState({
-    firstName: '',
-    lastName: '',
-    avatarUrl: '',
-    languageLevel: 'A1',
-    goalType: 'LEARN_KYRGYZ',
-  })
-  const [profileError, setProfileError] = useState('')
-  const [isProfileSaving, setIsProfileSaving] = useState(false)
 
   const loadUsers = useCallback(async () => {
     setIsLoading(true)
@@ -253,41 +243,6 @@ function UsersManager() {
     }
   }
 
-  const openProfile = async () => {
-    setProfileError('')
-    try {
-      const me = await refreshProfile()
-      setProfileForm({
-        firstName: me?.firstName || '',
-        lastName: me?.lastName || '',
-        avatarUrl: me?.avatarUrl || '',
-        languageLevel: me?.languageLevel || 'A1',
-        goalType: me?.goalType || 'LEARN_KYRGYZ',
-      })
-      setIsProfileOpen(true)
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Не удалось загрузить профиль'
-      setActionInfo(message)
-    }
-  }
-
-  const saveProfile = async (event) => {
-    event.preventDefault()
-    setIsProfileSaving(true)
-    setProfileError('')
-
-    try {
-      await saveMyProfile(profileForm)
-      setActionInfo('Профиль обновлен')
-      setIsProfileOpen(false)
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Не удалось обновить профиль'
-      setProfileError(message)
-    } finally {
-      setIsProfileSaving(false)
-    }
-  }
-
   return (
     <section className="admin-page users-page">
       <header className="users-page-header users-page-header--row">
@@ -295,9 +250,6 @@ function UsersManager() {
           <h1>Управление пользователями</h1>
           <p>Просмотр и управление учетными записями</p>
         </div>
-        <button className="users-profile-btn" type="button" onClick={openProfile}>
-          Мой профиль
-        </button>
       </header>
 
       <div className="users-summary-grid">
@@ -350,8 +302,8 @@ function UsersManager() {
 
       <section className="users-table-card">
         {isLoading ? <div className="users-feedback">Загрузка пользователей...</div> : null}
-        {!isLoading && error ? <div className="users-feedback users-feedback--error app-toast">{error}</div> : null}
-        {actionInfo ? <div className="users-feedback app-toast">{actionInfo}</div> : null}
+        {!isLoading && error ? <Toast message={error} tone="error" onClose={() => setError('')} /> : null}
+        {actionInfo ? <Toast message={actionInfo} onClose={() => setActionInfo('')} /> : null}
 
         {!isLoading && !error ? (
           filteredUsers.length > 0 ? (
@@ -508,45 +460,6 @@ function UsersManager() {
         </div>
       ) : null}
 
-      {isProfileOpen ? (
-        <div className="users-modal-overlay" role="dialog" aria-modal="true" aria-label="Мой профиль">
-          <form className="users-modal" onSubmit={saveProfile}>
-            <header className="users-modal-header">
-              <h2>Мой профиль</h2>
-              <button type="button" className="users-modal-close" onClick={() => setIsProfileOpen(false)}>
-                ×
-              </button>
-            </header>
-
-            <div className="users-modal-body">
-              <label className="users-modal-label" htmlFor="first-name">Имя</label>
-              <input id="first-name" value={profileForm.firstName} onChange={(event) => setProfileForm((prev) => ({ ...prev, firstName: event.target.value }))} />
-
-              <label className="users-modal-label" htmlFor="last-name">Фамилия</label>
-              <input id="last-name" value={profileForm.lastName} onChange={(event) => setProfileForm((prev) => ({ ...prev, lastName: event.target.value }))} />
-
-              <label className="users-modal-label" htmlFor="avatar-url">Avatar URL</label>
-              <input id="avatar-url" value={profileForm.avatarUrl} onChange={(event) => setProfileForm((prev) => ({ ...prev, avatarUrl: event.target.value }))} />
-
-              <label className="users-modal-label" htmlFor="language-level">Уровень языка</label>
-              <input id="language-level" value={profileForm.languageLevel} onChange={(event) => setProfileForm((prev) => ({ ...prev, languageLevel: event.target.value }))} />
-
-              <label className="users-modal-label" htmlFor="goal-type">Цель</label>
-              <select id="goal-type" value={profileForm.goalType} onChange={(event) => setProfileForm((prev) => ({ ...prev, goalType: event.target.value }))}>
-                {GOAL_OPTIONS.map((goal) => (
-                  <option key={goal.value} value={goal.value}>{goal.label}</option>
-                ))}
-              </select>
-
-              {profileError ? <p className="users-feedback users-feedback--error">{profileError}</p> : null}
-
-              <button type="submit" className="users-profile-btn" disabled={isProfileSaving}>
-                {isProfileSaving ? 'Сохраняем...' : 'Сохранить профиль'}
-              </button>
-            </div>
-          </form>
-        </div>
-      ) : null}
     </section>
   )
 }

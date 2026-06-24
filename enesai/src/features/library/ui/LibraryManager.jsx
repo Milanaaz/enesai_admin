@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '../../auth/context/useAuth.js'
 import AdminIcon from '../../../shared/ui/AdminIcon.jsx'
+import Toast from '../../../shared/ui/Toast/Toast.jsx'
 import BookFormModal from '../manage-book/ui/BookFormModal.jsx'
 import PageFormModal from '../manage-page/ui/PageFormModal.jsx'
 import {
@@ -28,6 +29,31 @@ import {
 import BooksTable from '../../../entities/library/ui/BooksTable.jsx'
 import LibraryBookDetails from '../../../widgets/library-book-details/ui/LibraryBookDetails.jsx'
 
+function matchesBookSearch(book, search) {
+  const query = String(search || '').trim().toLowerCase()
+  if (!query) return true
+
+  return [book?.title, book?.author, book?.genre, book?.level]
+    .filter(Boolean)
+    .some((value) => String(value).toLowerCase().includes(query))
+}
+
+function mergeBooks(catalogBooks, adminOnlyBooks, search) {
+  const booksById = new Map()
+
+  for (const book of catalogBooks) {
+    if (book?.id) booksById.set(book.id, book)
+  }
+
+  for (const book of Object.values(adminOnlyBooks)) {
+    if (book?.id && matchesBookSearch(book, search)) {
+      booksById.set(book.id, book)
+    }
+  }
+
+  return Array.from(booksById.values())
+}
+
 function LibraryManager() {
   const { token } = useAuth()
   const [books, setBooks] = useState([])
@@ -53,8 +79,9 @@ function LibraryManager() {
         token,
         search,
       })
-      setBooks(page.content)
-      setTotalBooks(page.totalElements || page.content.length)
+      const mergedBooks = mergeBooks(page.content, draftBooks, search)
+      setBooks(mergedBooks)
+      setTotalBooks(mergedBooks.length)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Не удалось загрузить книги')
       setBooks([])
@@ -62,7 +89,7 @@ function LibraryManager() {
     } finally {
       setBusy('')
     }
-  }, [search, token])
+  }, [draftBooks, search, token])
 
   const loadSelectedBook = useCallback(async () => {
     if (!selectedBookId) {
@@ -241,9 +268,19 @@ function LibraryManager() {
     setInfo('')
     try {
       await archiveAdminBook({ token, bookId: selectedBookId })
+      const archivedBook = {
+        ...selectedBook,
+        id: selectedBookId,
+        status: 'ARCHIVED',
+      }
+      setDraftBooks((current) => ({ ...current, [selectedBookId]: archivedBook }))
+      setBooks((current) => {
+        const mergedBooks = mergeBooks(current, { ...draftBooks, [selectedBookId]: archivedBook }, search)
+        setTotalBooks(mergedBooks.length)
+        return mergedBooks
+      })
       setInfo('Книга архивирована')
       backToList()
-      await loadBooks()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Не удалось архивировать книгу')
     } finally {
@@ -281,8 +318,17 @@ function LibraryManager() {
     try {
       await deleteAdminBook({ token, bookId: selectedBookId })
       setInfo('Книга удалена')
+      setDraftBooks((current) => {
+        const next = { ...current }
+        delete next[selectedBookId]
+        return next
+      })
+      setBooks((current) => {
+        const nextBooks = current.filter((book) => book.id !== selectedBookId)
+        setTotalBooks(nextBooks.length)
+        return nextBooks
+      })
       backToList()
-      await loadBooks()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Не удалось удалить книгу')
     } finally {
@@ -347,8 +393,8 @@ function LibraryManager() {
           </div>
         </header>
 
-        {error ? <div className="library-feedback library-feedback--error app-toast">{error}</div> : null}
-        {info ? <div className="library-feedback app-toast">{info}</div> : null}
+        {error ? <Toast message={error} tone="error" onClose={() => setError('')} /> : null}
+        {info ? <Toast message={info} onClose={() => setInfo('')} /> : null}
 
         {detailBusy && !selectedBook ? <div className="library-detail-panel"><div className="library-empty">Загрузка книги...</div></div> : null}
         {!detailBusy && !selectedBook ? <div className="library-detail-panel"><div className="library-empty">Книга не найдена</div></div> : null}
@@ -395,8 +441,8 @@ function LibraryManager() {
         <span className="library-total">Всего: {totalBooks}</span>
       </section>
 
-      {error ? <div className="library-feedback library-feedback--error app-toast">{error}</div> : null}
-      {info ? <div className="library-feedback app-toast">{info}</div> : null}
+      {error ? <Toast message={error} tone="error" onClose={() => setError('')} /> : null}
+      {info ? <Toast message={info} onClose={() => setInfo('')} /> : null}
 
       <BooksTable books={books} busy={busy} onOpenBook={openBook} />
 

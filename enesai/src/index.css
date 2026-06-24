@@ -30,11 +30,24 @@ a {
   position: fixed;
   right: 24px;
   bottom: 24px;
-  z-index: 1000;
+  z-index: 9999;
   width: min(420px, calc(100vw - 32px));
   margin: 0;
+  border: 1px solid #b9e2ca;
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: #effaf3;
   box-shadow: 0 18px 45px rgba(15, 23, 42, 0.16);
+  color: #1f6f4b;
+  font-size: 13px;
+  font-weight: 700;
   animation: app-toast-in 180ms ease-out;
+}
+
+.app-toast--error {
+  border-color: #f2beb8;
+  background: #fff1f0;
+  color: #bc2c23;
 }
 
 @keyframes app-toast-in {

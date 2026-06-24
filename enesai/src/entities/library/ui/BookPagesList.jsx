@@ -12,7 +12,6 @@ function BookPagesList({ pages, busy, onEditPage, onDeletePage }) {
           <header>
             <h3>Страница {page.pageNumber}</h3>
             <div className="library-page-tools">
-              <span>{page.progressPercent ?? 0}%</span>
               {page.id ? <button type="button" onClick={() => onEditPage(page)}>Редактировать</button> : null}
               {page.id ? (
                 <button

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../../auth/context/useAuth.js'
 import AdminIcon from '../../../shared/ui/AdminIcon.jsx'
+import Toast from '../../../shared/ui/Toast/Toast.jsx'
 import {
   blockManagementUser,
   createAdmin,
@@ -230,7 +231,7 @@ function AdminsManager() {
     setActionInfo('')
     try {
       await updateManagementUserRole({ token, userId: selectedAdmin.id, role: roleDraft })
-      setActionInfo('� оль администратора обновлена')
+      setActionInfo('Роль администратора обновлена')
       closeRoleEditor()
       await loadAdmins()
     } catch (saveError) {
@@ -321,7 +322,7 @@ function AdminsManager() {
           />
         </label>
 
-        <select value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)} aria-label="� оль">
+        <select value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)} aria-label="роль">
           {ROLE_FILTER_OPTIONS.map((role) => (
             <option key={role} value={role}>
               {role === 'ALL' ? 'Все роли' : ROLE_LABELS[role]}
@@ -332,8 +333,8 @@ function AdminsManager() {
 
       <section className="admins-table-card">
         {isLoading ? <div className="users-feedback">Загрузка администраторов...</div> : null}
-        {!isLoading && error ? <div className="users-feedback users-feedback--error app-toast">{error}</div> : null}
-        {actionInfo ? <div className="users-feedback app-toast">{actionInfo}</div> : null}
+        {!isLoading && error ? <Toast message={error} tone="error" onClose={() => setError('')} /> : null}
+        {actionInfo ? <Toast message={actionInfo} onClose={() => setActionInfo('')} /> : null}
 
         {!isLoading && !error ? (
           filteredAdmins.length > 0 ? (
@@ -342,7 +343,7 @@ function AdminsManager() {
                 <tr>
                   <th>Администратор</th>
                   <th>Email</th>
-                  <th>� оль</th>
+                  <th>Роль</th>
                   <th>Статус</th>
                   <th>Действия</th>
                 </tr>
@@ -439,10 +440,10 @@ function AdminsManager() {
                 type="password"
                 value={createForm.password}
                 onChange={(event) => setCreateForm((prev) => ({ ...prev, password: event.target.value }))}
-                placeholder="Если API разрешает автогенерацию, можно оставить пустым"
+                placeholder="Пароль (оставьте пустым для авто-генерации)"
               />
 
-              <label className="users-modal-label" htmlFor="admin-role">� оль</label>
+              <label className="users-modal-label" htmlFor="admin-role">Роль</label>
               <select
                 id="admin-role"
                 value={createForm.role}
@@ -469,7 +470,7 @@ function AdminsManager() {
         <div className="users-modal-overlay" role="dialog" aria-modal="true" aria-label="Изменение роли администратора">
           <div className="users-modal admins-modal">
             <header className="users-modal-header">
-              <h2>� оль администратора</h2>
+              <h2>Роль администратора</h2>
               <button type="button" className="users-modal-close" onClick={closeRoleEditor}>
                 x
               </button>
