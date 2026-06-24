@@ -347,8 +347,8 @@ function LibraryManager() {
           </div>
         </header>
 
-        {error ? <div className="library-feedback library-feedback--error">{error}</div> : null}
-        {info ? <div className="library-feedback">{info}</div> : null}
+        {error ? <div className="library-feedback library-feedback--error app-toast">{error}</div> : null}
+        {info ? <div className="library-feedback app-toast">{info}</div> : null}
 
         {detailBusy && !selectedBook ? <div className="library-detail-panel"><div className="library-empty">Загрузка книги...</div></div> : null}
         {!detailBusy && !selectedBook ? <div className="library-detail-panel"><div className="library-empty">Книга не найдена</div></div> : null}
@@ -395,8 +395,8 @@ function LibraryManager() {
         <span className="library-total">Всего: {totalBooks}</span>
       </section>
 
-      {error ? <div className="library-feedback library-feedback--error">{error}</div> : null}
-      {info ? <div className="library-feedback">{info}</div> : null}
+      {error ? <div className="library-feedback library-feedback--error app-toast">{error}</div> : null}
+      {info ? <div className="library-feedback app-toast">{info}</div> : null}
 
       <BooksTable books={books} busy={busy} onOpenBook={openBook} />
 

@@ -332,8 +332,8 @@ function AdminsManager() {
 
       <section className="admins-table-card">
         {isLoading ? <div className="users-feedback">Загрузка администраторов...</div> : null}
-        {!isLoading && error ? <div className="users-feedback users-feedback--error">{error}</div> : null}
-        {actionInfo ? <div className="users-feedback">{actionInfo}</div> : null}
+        {!isLoading && error ? <div className="users-feedback users-feedback--error app-toast">{error}</div> : null}
+        {actionInfo ? <div className="users-feedback app-toast">{actionInfo}</div> : null}
 
         {!isLoading && !error ? (
           filteredAdmins.length > 0 ? (

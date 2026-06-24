@@ -601,8 +601,8 @@ function CoursesManager() {
         </select>
       </section>
 
-      {error ? <div className="courses-feedback courses-feedback--error">{error}</div> : null}
-      {info ? <div className="courses-feedback">{info}</div> : null}
+      {error ? <div className="courses-feedback courses-feedback--error app-toast">{error}</div> : null}
+      {info ? <div className="courses-feedback app-toast">{info}</div> : null}
 
       <div className="courses-lms-layout">
         <aside className="courses-tree-panel">

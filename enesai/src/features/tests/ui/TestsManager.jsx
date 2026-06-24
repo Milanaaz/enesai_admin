@@ -763,8 +763,8 @@ function TestsManager() {
 
           <section className="tests-table-card">
             {isLoading ? <div className="tests-feedback">Загрузка вопросов...</div> : null}
-            {!isLoading && error ? <div className="tests-feedback tests-feedback--error">{error}</div> : null}
-            {info ? <div className="tests-feedback">{info}</div> : null}
+            {!isLoading && error ? <div className="tests-feedback tests-feedback--error app-toast">{error}</div> : null}
+            {info ? <div className="tests-feedback app-toast">{info}</div> : null}
             {!isLoading && !error ? (
               questions.length > 0 ? (
                 <table className="tests-table">

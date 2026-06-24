@@ -350,8 +350,8 @@ function UsersManager() {
 
       <section className="users-table-card">
         {isLoading ? <div className="users-feedback">Загрузка пользователей...</div> : null}
-        {!isLoading && error ? <div className="users-feedback users-feedback--error">{error}</div> : null}
-        {actionInfo ? <div className="users-feedback">{actionInfo}</div> : null}
+        {!isLoading && error ? <div className="users-feedback users-feedback--error app-toast">{error}</div> : null}
+        {actionInfo ? <div className="users-feedback app-toast">{actionInfo}</div> : null}
 
         {!isLoading && !error ? (
           filteredUsers.length > 0 ? (

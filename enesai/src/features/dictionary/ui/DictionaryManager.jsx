@@ -208,8 +208,8 @@ function DictionaryManager() {
         </datalist>
       </section>
 
-      {error ? <div className="dictionary-feedback dictionary-feedback--error">{error}</div> : null}
-      {info ? <div className="dictionary-feedback">{info}</div> : null}
+      {error ? <div className="dictionary-feedback dictionary-feedback--error app-toast">{error}</div> : null}
+      {info ? <div className="dictionary-feedback app-toast">{info}</div> : null}
 
       <section className="dictionary-table-card">
         {busy === 'load' ? <div className="dictionary-empty">Загрузка слов...</div> : null}

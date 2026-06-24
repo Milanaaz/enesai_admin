@@ -276,10 +276,6 @@ function DashboardStats({ onOpenUsersPage, onOpenCoursesPage }) {
             <span>{formatNumber(course.totalLessons)} уроков</span>
           </p>
         </div>
-        <div className="admin-course-rating">
-          <strong>{course.rating.toFixed(1)}</strong>
-          <AdminIcon name="star" className="admin-icon" />
-        </div>
       </div>
     ))
   }, [coursesError, popularCourses])
